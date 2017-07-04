@@ -31,7 +31,7 @@ Methods can be invoked from the Client:
 	defer cancel()
 
 	c := cdp.NewClient(conn)
-	nav, err := c.Page.Navigate(ctx, cdpcmd.NewPageNavigateArgs("https://www.google.com"))
+	nav, err := c.Page.Navigate(ctx, page.NewNavigateArgs("https://www.google.com"))
 	if err != nil {
 		// Handle error.
 	}

@@ -8,8 +8,10 @@ import (
 	"time"
 
 	"github.com/mafredri/cdp"
-	"github.com/mafredri/cdp/cdpcmd"
-	"github.com/mafredri/cdp/cdptype"
+	"github.com/mafredri/cdp/protocol/dom"
+	"github.com/mafredri/cdp/protocol/network"
+	"github.com/mafredri/cdp/protocol/page"
+	"github.com/mafredri/cdp/protocol/runtime"
 	"github.com/mafredri/cdp/rpcc"
 
 	"golang.org/x/sync/errgroup"
@@ -106,7 +108,7 @@ func Example_advanced() {
 			}, 500);
 		});
 	`
-	evalArgs := cdpcmd.NewRuntimeEvaluateArgs(expression).SetAwaitPromise(true).SetReturnByValue(true)
+	evalArgs := runtime.NewEvaluateArgs(expression).SetAwaitPromise(true).SetReturnByValue(true)
 	eval, err := c.Runtime.Evaluate(ctx, evalArgs)
 	if err != nil {
 		fmt.Println(err)
@@ -128,7 +130,7 @@ func Example_advanced() {
 	}
 
 	// Fetch all <script> and <noscript> elements so we can delete them.
-	scriptIDs, err := c.DOM.QuerySelectorAll(ctx, cdpcmd.NewDOMQuerySelectorAllArgs(doc.Root.NodeID, "script, noscript"))
+	scriptIDs, err := c.DOM.QuerySelectorAll(ctx, dom.NewQuerySelectorAllArgs(doc.Root.NodeID, "script, noscript"))
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -196,7 +198,7 @@ func catchLoadingFailed(ctx context.Context, net cdp.Network, abort chan<- error
 func setCookies(ctx context.Context, net cdp.Network, cookies ...Cookie) error {
 	var cmds []runBatchFunc
 	for _, c := range cookies {
-		args := cdpcmd.NewNetworkSetCookieArgs(c.URL, c.Name, c.Value)
+		args := network.NewSetCookieArgs(c.URL, c.Name, c.Value)
 		cmds = append(cmds, func() error {
 			reply, err := net.SetCookie(ctx, args)
 			if err != nil {
@@ -213,24 +215,24 @@ func setCookies(ctx context.Context, net cdp.Network, cookies ...Cookie) error {
 
 // navigate to the URL and wait for DOMContentEventFired. An error is
 // returned if timeout happens before DOMContentEventFired.
-func navigate(ctx context.Context, page cdp.Page, url string, timeout time.Duration) (frame cdptype.PageFrameID, err error) {
+func navigate(ctx context.Context, pageClient cdp.Page, url string, timeout time.Duration) (frame page.FrameID, err error) {
 	var cancel context.CancelFunc
 	ctx, cancel = context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	// Make sure Page events are enabled.
-	if err = page.Enable(ctx); err != nil {
+	if err = pageClient.Enable(ctx); err != nil {
 		return frame, err
 	}
 
 	// Open client for DOMContentEventFired to block until DOM has fully loaded.
-	domContentEventFired, err := page.DOMContentEventFired(ctx)
+	domContentEventFired, err := pageClient.DOMContentEventFired(ctx)
 	if err != nil {
 		return frame, err
 	}
 	defer domContentEventFired.Close()
 
-	nav, err := page.Navigate(ctx, cdpcmd.NewPageNavigateArgs(url))
+	nav, err := pageClient.Navigate(ctx, page.NewNavigateArgs(url))
 	if err != nil {
 		return frame, err
 	}
@@ -240,11 +242,11 @@ func navigate(ctx context.Context, page cdp.Page, url string, timeout time.Durat
 }
 
 // removeNodes deletes all provided nodeIDs from the DOM.
-func removeNodes(ctx context.Context, dom cdp.DOM, nodes ...cdptype.DOMNodeID) error {
+func removeNodes(ctx context.Context, domClient cdp.DOM, nodes ...dom.NodeID) error {
 	var rmNodes []runBatchFunc
 	for _, id := range nodes {
-		arg := cdpcmd.NewDOMRemoveNodeArgs(id)
-		rmNodes = append(rmNodes, func() error { return dom.RemoveNode(ctx, arg) })
+		arg := dom.NewRemoveNodeArgs(id)
+		rmNodes = append(rmNodes, func() error { return domClient.RemoveNode(ctx, arg) })
 	}
 	return runBatch(rmNodes...)
 }
