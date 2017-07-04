@@ -77,11 +77,135 @@ func main() {
 		return protocol.Domains[i].Domain < protocol.Domains[j].Domain
 	})
 
+	// generateUnifiedDomains(destPkg, protocol)
+
+	protoDest := path.Join(destPkg, "protocol")
+	imports := []string{
+		"github.com/mafredri/cdp/rpcc",
+	}
+	for i, d := range protocol.Domains {
+		dLower := strings.ToLower(d.Name())
+		imports = append(imports, path.Join(protoDest, dLower))
+
+		for ii, t := range d.Types {
+			nam := t.Name(d)
+			if isNonPointer(d.Domain, d, t) {
+				nonPtrMap[nam] = true
+				nonPtrMap[d.Domain+"."+nam] = true
+			}
+
+			// Reference the FrameId in the Frame type.
+			if d.Domain == "Page" && t.IDName == "Frame" {
+				for iii, p := range t.Properties {
+					if p.NameName == "id" || p.NameName == "parentId" {
+						p.Ref = "FrameId"
+						t.Properties[iii] = p
+					}
+				}
+			}
+			d.Types[ii] = t
+		}
+		protocol.Domains[i] = d
+	}
+	nonPtrMap["Timestamp"] = true
+	nonPtrMap["protocol.Timestamp"] = true
+
+	var cdp, g Generator
+	cdp.imports = imports
+	g.imports = imports
+
+	// Define the cdp Client.
+	cdp.pkg = "cdp"
+	cdp.dir = destPkg
+	cdp.PackageHeader()
+	cdp.CdpClient(protocol.Domains)
+	cdp.writeFile("cdp_client.go")
+
+	// Write general protocol definitions.
+	g.pkg = "protocol"
+	g.dir = protoDest
+	err = mkdir(g.path())
+	panicErr(err)
+
+	g.PackageHeader()
+	g.hasContent = true
+	// Add a custom Timestamp type.
+	g.Printf(`
+// Timestamp represents a timestamp (since epoch).
+type Timestamp `)
+	g.domainTypeTime(proto.Domain{}, proto.AnyType{NameName: "Timestamp", Type: "number"})
+	g.Printf("\n\n")
+	g.writeFile("protocol.go")
+
+	for _, d := range protocol.Domains {
+		cdp.PackageHeader()
+		cdp.DomainInterface(d)
+
+		dLower := strings.ToLower(d.Domain)
+		g.dir = path.Join(protoDest, dLower)
+		g.pkg = dLower
+		err := mkdir(g.path())
+		panicErr(err)
+
+		g.PackageHeader()
+		g.DomainDefinition(d)
+		g.writeFile("domain.go")
+
+		if len(d.Types) > 0 {
+			g.PackageHeader()
+			for _, t := range d.Types {
+				g.DomainType(d, t)
+			}
+			g.writeFile("types.go")
+		}
+
+		if len(d.Commands) > 0 {
+			g.PackageHeader()
+			for _, c := range d.Commands {
+				g.DomainCmd(d, c)
+			}
+			g.writeFile("command.go")
+		}
+
+		if len(d.Events) > 0 {
+			g.PackageHeader()
+			for _, e := range d.Events {
+				g.DomainEvent(d, e)
+			}
+			g.writeFile("event.go")
+		}
+	}
+
+	cdp.writeFile(cdp.pkg + ".go")
+
+	g.dir = destPkg
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	goimports := exec.CommandContext(ctx, "goimports", "-w", g.path())
+	out, err := goimports.CombinedOutput()
+	if err != nil {
+		log.Printf("%s", out)
+		log.Println(err)
+		os.Exit(1)
+	}
+
+	goinstall := exec.CommandContext(ctx, "go", "install", path.Join(destPkg, "..."))
+	out, err = goinstall.CombinedOutput()
+	if err != nil {
+		log.Printf("%s", out)
+		log.Println(err)
+		os.Exit(1)
+	}
+}
+
+func generateUnifiedDomains(destPkg string, protocol proto.Protocol) {
 	var cdpgen, typegen, cmdgen, eventgen, domgen Generator
 
 	cdpgen.dir = destPkg
 	cdpgen.pkg = "cdp"
-	err = mkdir(cdpgen.path())
+	err := mkdir(cdpgen.path())
 	panicErr(err)
 
 	typegen.pkg = "cdptype"
@@ -105,13 +229,22 @@ func main() {
 	err = mkdir(domgen.path())
 	panicErr(err)
 
+	var imports []string
+	for _, d := range protocol.Domains {
+		imports = append(imports, path.Join(cdpgen.dir, strings.ToLower(d.Name())))
+	}
+
 	cdpgen.imports = []string{
 		"github.com/mafredri/cdp/rpcc",
 		typegen.dir, cmdgen.dir, eventgen.dir, domgen.dir,
 	}
+	cdpgen.imports = append(cdpgen.imports, imports...)
 	cmdgen.imports = []string{typegen.dir}
+	cmdgen.imports = append(cmdgen.imports, imports...)
 	eventgen.imports = []string{typegen.dir}
+	eventgen.imports = append(eventgen.imports, imports...)
 	domgen.imports = []string{typegen.dir, cmdgen.dir, eventgen.dir}
+	domgen.imports = append(domgen.imports, imports...)
 
 	// Define the cdp Client.
 	cdpgen.PackageHeader()
@@ -298,7 +431,7 @@ func (g *Generator) CdpClient(domains []proto.Domain) {
 	var fields, newFields Generator
 	for _, d := range domains {
 		fields.Printf("\t%s %s\n", d.Name(), d.Type())
-		newFields.Printf("\t\t%s: cdpdom.New%s(conn),\n", d.Name(), d.Name())
+		newFields.Printf("\t\t%s: %s.NewClient(conn),\n", d.Name(), strings.ToLower(d.Name()))
 	}
 	g.Printf(`
 // Client represents a Chrome Debugging Protocol client that can be used to
@@ -349,16 +482,16 @@ type %[1]s interface{`, d.Name(), d.Desc())
 		request := ""
 		reply := "error"
 		if len(c.Parameters) > 0 {
-			request = ", *cdpcmd." + c.ArgsName(d)
+			request = ", *" + strings.ToLower(d.Name()) + "." + c.ArgsName(d)
 		}
 		if len(c.Returns) > 0 {
-			reply = fmt.Sprintf("(*cdpcmd.%s, error)", c.ReplyName(d))
+			reply = fmt.Sprintf("(*%s.%s, error)", strings.ToLower(d.Name()), c.ReplyName(d))
 		}
 		g.Printf("\n\t// Command %s\n\t//\n\t// %s\n\t%s(context.Context%s) %s\n", c.Name(), c.Desc(true), c.Name(), request, reply)
 	}
 	for _, e := range d.Events {
 		eventClient := fmt.Sprintf("%sClient", e.EventName(d))
-		g.Printf("\n\t// Event %s\n\t//\n\t// %s\n\t%s(context.Context) (cdpevent.%s, error)\n", e.Name(), e.Desc(true), e.Name(), eventClient)
+		g.Printf("\n\t// Event %s\n\t//\n\t// %s\n\t%s(context.Context) (%s.%s, error)\n", e.Name(), e.Desc(true), e.Name(), strings.ToLower(d.Name()), eventClient)
 	}
 	g.Printf("}\n")
 }
@@ -368,55 +501,55 @@ func (g *Generator) DomainDefinition(d proto.Domain) {
 	g.hasContent = true
 
 	g.Printf(`
-// The %[1]s domain. %[2]s
+// %[1]s is a client for the %[2]s domain. %[3]s
 type %[1]s struct{ conn *rpcc.Conn }
 
-// New%[1]s returns the domain with the connection set to conn.
-func New%[1]s(conn *rpcc.Conn) *%[1]s {
+// NewClient returns a client for the %[2]s domain with the connection set to conn.
+func NewClient(conn *rpcc.Conn) *%[1]s {
 	return &%[1]s{conn: conn}
 }
-`, d.Name(), d.Desc())
+`, "domainClient", d.Name(), d.Desc())
 
 	for _, c := range d.Commands {
 		request := ""
 		invokeReply := "nil"
 		if len(c.Parameters) > 0 {
-			request = ", args *cdpcmd." + c.ArgsName(d)
+			request = ", args *" + c.ArgsName(d)
 		}
 		reply := "(err error)"
 		if len(c.Returns) > 0 {
-			reply = fmt.Sprintf("(reply *cdpcmd.%s, err error)", c.ReplyName(d))
+			reply = fmt.Sprintf("(reply *%s, err error)", c.ReplyName(d))
 		}
 		g.Printf(`
 // %[1]s invokes the %[2]s method. %[5]s
-func (d *%[2]s) %[1]s(ctx context.Context%[3]s) %[4]s {`, c.Name(), d.Name(), request, reply, c.Desc(true))
+func (d *domainClient) %[1]s(ctx context.Context%[3]s) %[4]s {`, c.Name(), d.Name(), request, reply, c.Desc(true))
 		if len(c.Returns) > 0 {
 			g.Printf(`
-	reply = new(cdpcmd.%s)`, c.ReplyName(d))
+	reply = new(%s)`, c.ReplyName(d))
 			invokeReply = "reply"
 		}
 		if len(c.Parameters) > 0 {
 			g.Printf(`
 	if args != nil {
-		err = rpcc.Invoke(ctx, cdpcmd.%[1]s.String(), args, %[2]s, d.conn)
+		err = rpcc.Invoke(ctx, %[1]q, args, %[2]s, d.conn)
 	} else {
-		err = rpcc.Invoke(ctx, cdpcmd.%[1]s.String(), nil, %[2]s, d.conn)
+		err = rpcc.Invoke(ctx, %[1]q, nil, %[2]s, d.conn)
 	}
 	if err != nil {
-		err = &opError{Domain: %[3]q, Op: %[4]q, Err: err}
+		err = &internal.OpError{Domain: %[3]q, Op: %[4]q, Err: err}
 	}
 	return
 }
-`, c.CmdName(d, true), invokeReply, d.Name(), c.Name())
+`, d.Domain+"."+c.NameName, invokeReply, d.Name(), c.Name())
 		} else {
 			g.Printf(`
-	err = rpcc.Invoke(ctx, cdpcmd.%s.String(), nil, %s, d.conn)
+	err = rpcc.Invoke(ctx, %q, nil, %s, d.conn)
 	if err != nil {
-		err = &opError{Domain: %q, Op: %q, Err: err}
+		err = &internal.OpError{Domain: %q, Op: %q, Err: err}
 	}
 	return
 }
-`, c.CmdName(d, true), invokeReply, d.Name(), c.Name())
+`, d.Domain+"."+c.NameName, invokeReply, d.Name(), c.Name())
 		}
 
 		// Generate method tests.
@@ -440,7 +573,7 @@ func Test%[1]s_%[2]s(t *testing.T) {
 		t.Error(err)
 	}
 	// Test args.
-	%[1]s = dom.%[2]s(nil, &cdpcmd.%[3]s{})`, assign, c.Name(), c.ArgsName(d))
+	%[1]s = dom.%[2]s(nil, &%[3]s{})`, assign, c.Name(), c.ArgsName(d))
 		} else {
 			g.TestPrintf(`
 	%[1]s = dom.%[2]s(nil)`, assign, c.Name())
@@ -454,13 +587,13 @@ func Test%[1]s_%[2]s(t *testing.T) {
 	codec.respErr = errors.New("bad request")`)
 		if len(c.Parameters) > 0 {
 			g.TestPrintf(`
-	%[1]s = dom.%[2]s(nil, &cdpcmd.%[3]s{})`, assign, c.Name(), c.ArgsName(d))
+	%[1]s = dom.%[2]s(nil, &%[3]s{})`, assign, c.Name(), c.ArgsName(d))
 		} else {
 			g.TestPrintf(`
 	%[1]s = dom.%[2]s(nil)`, assign, c.Name())
 		}
 		g.TestPrintf(`
-	if err == nil || err.(*opError).Err.(*rpcc.ResponseError).Message != codec.respErr.Error() {
+	if err == nil || err.(*internal.OpError).Err.(*rpcc.ResponseError).Message != codec.respErr.Error() {
 		t.Errorf("unexpected error; got: %%v, want bad request", err)
 	}`)
 		g.TestPrintf(`
@@ -469,33 +602,30 @@ func Test%[1]s_%[2]s(t *testing.T) {
 	}
 	for _, e := range d.Events {
 		eventClient := fmt.Sprintf("%sClient", e.EventName(d))
+		eventClientImpl := strings.ToLower(string(eventClient[0])) + eventClient[1:]
 
 		// Implement event on domain.
 		g.Printf(`
-// %s creates the event client. %s
-func (d *%s) %s(ctx context.Context) (cdpevent.%s, error) {
-	s, err := rpcc.NewStream(ctx, cdpevent.%s.String(), d.conn)
+func (d *domainClient) %s(ctx context.Context) (%s, error) {
+	s, err := rpcc.NewStream(ctx, %q, d.conn)
 	if err != nil {
 		return nil, err
 	}
 	return &%s{Stream: s}, nil
 }
-`, e.Name(), e.Desc(true), d.Name(), e.Name(), eventClient, e.EventName(d), eventClient)
+`, e.Name(), eventClient, d.Domain+"."+e.NameName, eventClientImpl)
 
 		g.Printf(`
-// %[4]s implements cdpevent.%[1]s.
 type %[4]s struct { rpcc.Stream }
 
-// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
-// triggered, context canceled or connection closed.
-func (c *%[4]s) Recv() (*cdpevent.%[3]s, error) {
-	event := new(cdpevent.%[3]s)
+func (c *%[4]s) Recv() (*%[3]s, error) {
+	event := new(%[3]s)
 	if err := c.RecvMsg(event); err != nil {
-		return nil, &opError{Domain: %[5]q, Op: "%[6]s Recv", Err: err}
+		return nil, &internal.OpError{Domain: %[5]q, Op: "%[6]s Recv", Err: err}
 	}
 	return event, nil
 }
-`, eventClient, "", e.ReplyName(d), eventClient, d.Name(), e.Name())
+`, eventClient, "", e.ReplyName(d), eventClientImpl, d.Name(), e.Name())
 
 		// Generate event tests.
 		g.TestPrintf(`
@@ -511,7 +641,7 @@ func Test%[1]s_%[2]s(t *testing.T) {
 	}
 	defer stream.Close()
 
-	codec.event = cdpevent.%[3]s.String()
+	codec.event = %[3]s.String()
 	codec.conn <- nil
 	_, err = stream.Recv()
 	if err != nil {
@@ -521,8 +651,8 @@ func Test%[1]s_%[2]s(t *testing.T) {
 	codec.eventArgs = []byte("invalid json")
 	codec.conn <- nil
 	_, err = stream.Recv()
-	if err, ok := err.(*opError); !ok {
-		t.Errorf("Recv() got %%v, want opError", err)
+	if err, ok := err.(*internal.OpError); !ok {
+		t.Errorf("Recv() got %%v, want internal.OpError", err)
 	}
 
 	conn.Close()
