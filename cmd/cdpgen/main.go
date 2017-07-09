@@ -1134,20 +1134,20 @@ func (g *Generator) DomainEvent(d proto.Domain, e proto.Event) {
 func (g *Generator) domainEventClient(d proto.Domain, e proto.Event) {
 	eventClient := fmt.Sprintf("%sClient", e.EventName(d))
 	g.Printf(`
-// %[1]s receives %[2]s events.
+// %[1]s is a client for %[2]s events. %[4]s
 type %[1]s interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
 	Recv() (*%[3]s, error)
 	rpcc.Stream
 }
-`, eventClient, e.Name(), e.ReplyName(d))
+`, eventClient, e.Name(), e.ReplyName(d), e.Desc(true))
 }
 
 func (g *Generator) domainEventReply(d proto.Domain, e proto.Event) {
 	g.Printf(`
-// %[1]s %[2]s
-type %[1]s struct {`, e.ReplyName(d), e.Desc(false))
+// %[1]s is the reply for %[2]s events.
+type %[1]s struct {`, e.ReplyName(d), e.Name())
 	g.printStructProperties(d, e.ReplyName(d), e.Parameters, true, false)
 	g.Printf("}\n")
 }
