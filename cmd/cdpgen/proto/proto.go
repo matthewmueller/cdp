@@ -289,13 +289,8 @@ func (at AnyType) GoType(pkg string, d Domain) string {
 		return prefix + nameInDomain(d, at.Ref, "")
 	}
 
-	// Special handling for parameters names "timestamp".
-	if at.NameName == "timestamp" && at.Type == "number" {
-		prefix := "protocol."
-		return prefix + "Timestamp"
-	}
 	// Special handling for domain types named "Timestamp".
-	if at.IDName == "Timestamp" && at.Type == "number" {
+	if (at.IDName == "Timestamp" || at.IDName == "TimeSinceEpoch" || at.IDName == "MonotonicTime") && at.Type == "number" {
 		return "time.Time"
 	}
 
