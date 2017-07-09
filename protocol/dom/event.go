@@ -6,7 +6,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// DocumentUpdatedClient receives DocumentUpdated events.
+// DocumentUpdatedClient is a client for DocumentUpdated events. Fired when Document has been totally updated. Node ids are no longer valid.
 type DocumentUpdatedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -14,10 +14,10 @@ type DocumentUpdatedClient interface {
 	rpcc.Stream
 }
 
-// DocumentUpdatedReply fired when Document has been totally updated. Node ids are no longer valid.
+// DocumentUpdatedReply is the reply for DocumentUpdated events.
 type DocumentUpdatedReply struct{}
 
-// SetChildNodesClient receives SetChildNodes events.
+// SetChildNodesClient is a client for SetChildNodes events. Fired when backend wants to provide client with the missing DOM structure. This happens upon most of the calls requesting node ids.
 type SetChildNodesClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -25,13 +25,13 @@ type SetChildNodesClient interface {
 	rpcc.Stream
 }
 
-// SetChildNodesReply fired when backend wants to provide client with the missing DOM structure. This happens upon most of the calls requesting node ids.
+// SetChildNodesReply is the reply for SetChildNodes events.
 type SetChildNodesReply struct {
 	ParentID NodeID `json:"parentId"` // Parent node id to populate with children.
 	Nodes    []Node `json:"nodes"`    // Child nodes array.
 }
 
-// AttributeModifiedClient receives AttributeModified events.
+// AttributeModifiedClient is a client for AttributeModified events. Fired when Element's attribute is modified.
 type AttributeModifiedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -39,14 +39,14 @@ type AttributeModifiedClient interface {
 	rpcc.Stream
 }
 
-// AttributeModifiedReply fired when Element's attribute is modified.
+// AttributeModifiedReply is the reply for AttributeModified events.
 type AttributeModifiedReply struct {
 	NodeID NodeID `json:"nodeId"` // Id of the node that has changed.
 	Name   string `json:"name"`   // Attribute name.
 	Value  string `json:"value"`  // Attribute value.
 }
 
-// AttributeRemovedClient receives AttributeRemoved events.
+// AttributeRemovedClient is a client for AttributeRemoved events. Fired when Element's attribute is removed.
 type AttributeRemovedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -54,13 +54,13 @@ type AttributeRemovedClient interface {
 	rpcc.Stream
 }
 
-// AttributeRemovedReply fired when Element's attribute is removed.
+// AttributeRemovedReply is the reply for AttributeRemoved events.
 type AttributeRemovedReply struct {
 	NodeID NodeID `json:"nodeId"` // Id of the node that has changed.
 	Name   string `json:"name"`   // A ttribute name.
 }
 
-// InlineStyleInvalidatedClient receives InlineStyleInvalidated events.
+// InlineStyleInvalidatedClient is a client for InlineStyleInvalidated events. Fired when Element's inline style is modified via a CSS property modification.
 type InlineStyleInvalidatedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -68,12 +68,12 @@ type InlineStyleInvalidatedClient interface {
 	rpcc.Stream
 }
 
-// InlineStyleInvalidatedReply fired when Element's inline style is modified via a CSS property modification.
+// InlineStyleInvalidatedReply is the reply for InlineStyleInvalidated events.
 type InlineStyleInvalidatedReply struct {
 	NodeIDs []NodeID `json:"nodeIds"` // Ids of the nodes for which the inline styles have been invalidated.
 }
 
-// CharacterDataModifiedClient receives CharacterDataModified events.
+// CharacterDataModifiedClient is a client for CharacterDataModified events. Mirrors DOMCharacterDataModified event.
 type CharacterDataModifiedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -81,13 +81,13 @@ type CharacterDataModifiedClient interface {
 	rpcc.Stream
 }
 
-// CharacterDataModifiedReply mirrors DOMCharacterDataModified event.
+// CharacterDataModifiedReply is the reply for CharacterDataModified events.
 type CharacterDataModifiedReply struct {
 	NodeID        NodeID `json:"nodeId"`        // Id of the node that has changed.
 	CharacterData string `json:"characterData"` // New text value.
 }
 
-// ChildNodeCountUpdatedClient receives ChildNodeCountUpdated events.
+// ChildNodeCountUpdatedClient is a client for ChildNodeCountUpdated events. Fired when Container's child node count has changed.
 type ChildNodeCountUpdatedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -95,13 +95,13 @@ type ChildNodeCountUpdatedClient interface {
 	rpcc.Stream
 }
 
-// ChildNodeCountUpdatedReply fired when Container's child node count has changed.
+// ChildNodeCountUpdatedReply is the reply for ChildNodeCountUpdated events.
 type ChildNodeCountUpdatedReply struct {
 	NodeID         NodeID `json:"nodeId"`         // Id of the node that has changed.
 	ChildNodeCount int    `json:"childNodeCount"` // New node count.
 }
 
-// ChildNodeInsertedClient receives ChildNodeInserted events.
+// ChildNodeInsertedClient is a client for ChildNodeInserted events. Mirrors DOMNodeInserted event.
 type ChildNodeInsertedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -109,14 +109,14 @@ type ChildNodeInsertedClient interface {
 	rpcc.Stream
 }
 
-// ChildNodeInsertedReply mirrors DOMNodeInserted event.
+// ChildNodeInsertedReply is the reply for ChildNodeInserted events.
 type ChildNodeInsertedReply struct {
 	ParentNodeID   NodeID `json:"parentNodeId"`   // Id of the node that has changed.
 	PreviousNodeID NodeID `json:"previousNodeId"` // If of the previous siblint.
 	Node           Node   `json:"node"`           // Inserted node data.
 }
 
-// ChildNodeRemovedClient receives ChildNodeRemoved events.
+// ChildNodeRemovedClient is a client for ChildNodeRemoved events. Mirrors DOMNodeRemoved event.
 type ChildNodeRemovedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -124,13 +124,13 @@ type ChildNodeRemovedClient interface {
 	rpcc.Stream
 }
 
-// ChildNodeRemovedReply mirrors DOMNodeRemoved event.
+// ChildNodeRemovedReply is the reply for ChildNodeRemoved events.
 type ChildNodeRemovedReply struct {
 	ParentNodeID NodeID `json:"parentNodeId"` // Parent id.
 	NodeID       NodeID `json:"nodeId"`       // Id of the node that has been removed.
 }
 
-// ShadowRootPushedClient receives ShadowRootPushed events.
+// ShadowRootPushedClient is a client for ShadowRootPushed events. Called when shadow root is pushed into the element.
 type ShadowRootPushedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -138,13 +138,13 @@ type ShadowRootPushedClient interface {
 	rpcc.Stream
 }
 
-// ShadowRootPushedReply called when shadow root is pushed into the element.
+// ShadowRootPushedReply is the reply for ShadowRootPushed events.
 type ShadowRootPushedReply struct {
 	HostID NodeID `json:"hostId"` // Host element id.
 	Root   Node   `json:"root"`   // Shadow root.
 }
 
-// ShadowRootPoppedClient receives ShadowRootPopped events.
+// ShadowRootPoppedClient is a client for ShadowRootPopped events. Called when shadow root is popped from the element.
 type ShadowRootPoppedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -152,13 +152,13 @@ type ShadowRootPoppedClient interface {
 	rpcc.Stream
 }
 
-// ShadowRootPoppedReply called when shadow root is popped from the element.
+// ShadowRootPoppedReply is the reply for ShadowRootPopped events.
 type ShadowRootPoppedReply struct {
 	HostID NodeID `json:"hostId"` // Host element id.
 	RootID NodeID `json:"rootId"` // Shadow root id.
 }
 
-// PseudoElementAddedClient receives PseudoElementAdded events.
+// PseudoElementAddedClient is a client for PseudoElementAdded events. Called when a pseudo element is added to an element.
 type PseudoElementAddedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -166,13 +166,13 @@ type PseudoElementAddedClient interface {
 	rpcc.Stream
 }
 
-// PseudoElementAddedReply called when a pseudo element is added to an element.
+// PseudoElementAddedReply is the reply for PseudoElementAdded events.
 type PseudoElementAddedReply struct {
 	ParentID      NodeID `json:"parentId"`      // Pseudo element's parent element id.
 	PseudoElement Node   `json:"pseudoElement"` // The added pseudo element.
 }
 
-// PseudoElementRemovedClient receives PseudoElementRemoved events.
+// PseudoElementRemovedClient is a client for PseudoElementRemoved events. Called when a pseudo element is removed from an element.
 type PseudoElementRemovedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -180,13 +180,13 @@ type PseudoElementRemovedClient interface {
 	rpcc.Stream
 }
 
-// PseudoElementRemovedReply called when a pseudo element is removed from an element.
+// PseudoElementRemovedReply is the reply for PseudoElementRemoved events.
 type PseudoElementRemovedReply struct {
 	ParentID        NodeID `json:"parentId"`        // Pseudo element's parent element id.
 	PseudoElementID NodeID `json:"pseudoElementId"` // The removed pseudo element id.
 }
 
-// DistributedNodesUpdatedClient receives DistributedNodesUpdated events.
+// DistributedNodesUpdatedClient is a client for DistributedNodesUpdated events. Called when distribution is changed.
 type DistributedNodesUpdatedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -194,7 +194,7 @@ type DistributedNodesUpdatedClient interface {
 	rpcc.Stream
 }
 
-// DistributedNodesUpdatedReply called when distribution is changed.
+// DistributedNodesUpdatedReply is the reply for DistributedNodesUpdated events.
 type DistributedNodesUpdatedReply struct {
 	InsertionPointID NodeID        `json:"insertionPointId"` // Insertion point where distributed nodes were updated.
 	DistributedNodes []BackendNode `json:"distributedNodes"` // Distributed nodes for given insertion point.

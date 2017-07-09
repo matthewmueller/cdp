@@ -8,7 +8,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// ExecutionContextCreatedClient receives ExecutionContextCreated events.
+// ExecutionContextCreatedClient is a client for ExecutionContextCreated events. Issued when new execution context is created.
 type ExecutionContextCreatedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -16,12 +16,12 @@ type ExecutionContextCreatedClient interface {
 	rpcc.Stream
 }
 
-// ExecutionContextCreatedReply issued when new execution context is created.
+// ExecutionContextCreatedReply is the reply for ExecutionContextCreated events.
 type ExecutionContextCreatedReply struct {
 	Context ExecutionContextDescription `json:"context"` // A newly created execution context.
 }
 
-// ExecutionContextDestroyedClient receives ExecutionContextDestroyed events.
+// ExecutionContextDestroyedClient is a client for ExecutionContextDestroyed events. Issued when execution context is destroyed.
 type ExecutionContextDestroyedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -29,12 +29,12 @@ type ExecutionContextDestroyedClient interface {
 	rpcc.Stream
 }
 
-// ExecutionContextDestroyedReply issued when execution context is destroyed.
+// ExecutionContextDestroyedReply is the reply for ExecutionContextDestroyed events.
 type ExecutionContextDestroyedReply struct {
 	ExecutionContextID ExecutionContextID `json:"executionContextId"` // Id of the destroyed context
 }
 
-// ExecutionContextsClearedClient receives ExecutionContextsCleared events.
+// ExecutionContextsClearedClient is a client for ExecutionContextsCleared events. Issued when all executionContexts were cleared in browser
 type ExecutionContextsClearedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -42,10 +42,10 @@ type ExecutionContextsClearedClient interface {
 	rpcc.Stream
 }
 
-// ExecutionContextsClearedReply issued when all executionContexts were cleared in browser
+// ExecutionContextsClearedReply is the reply for ExecutionContextsCleared events.
 type ExecutionContextsClearedReply struct{}
 
-// ExceptionThrownClient receives ExceptionThrown events.
+// ExceptionThrownClient is a client for ExceptionThrown events. Issued when exception was thrown and unhandled.
 type ExceptionThrownClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -53,13 +53,13 @@ type ExceptionThrownClient interface {
 	rpcc.Stream
 }
 
-// ExceptionThrownReply issued when exception was thrown and unhandled.
+// ExceptionThrownReply is the reply for ExceptionThrown events.
 type ExceptionThrownReply struct {
 	Timestamp        Timestamp        `json:"timestamp"`        // Timestamp of the exception.
 	ExceptionDetails ExceptionDetails `json:"exceptionDetails"` //
 }
 
-// ExceptionRevokedClient receives ExceptionRevoked events.
+// ExceptionRevokedClient is a client for ExceptionRevoked events. Issued when unhandled exception was revoked.
 type ExceptionRevokedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -67,13 +67,13 @@ type ExceptionRevokedClient interface {
 	rpcc.Stream
 }
 
-// ExceptionRevokedReply issued when unhandled exception was revoked.
+// ExceptionRevokedReply is the reply for ExceptionRevoked events.
 type ExceptionRevokedReply struct {
 	Reason      string `json:"reason"`      // Reason describing why exception was revoked.
 	ExceptionID int    `json:"exceptionId"` // The id of revoked exception, as reported in exceptionUnhandled.
 }
 
-// ConsoleAPICalledClient receives ConsoleAPICalled events.
+// ConsoleAPICalledClient is a client for ConsoleAPICalled events. Issued when console API was called.
 type ConsoleAPICalledClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -81,7 +81,7 @@ type ConsoleAPICalledClient interface {
 	rpcc.Stream
 }
 
-// ConsoleAPICalledReply issued when console API was called.
+// ConsoleAPICalledReply is the reply for ConsoleAPICalled events.
 type ConsoleAPICalledReply struct {
 	Type               string             `json:"type"`                 // Type of the call.
 	Args               []RemoteObject     `json:"args"`                 // Call arguments.
@@ -91,7 +91,7 @@ type ConsoleAPICalledReply struct {
 	Context            *string            `json:"context,omitempty"`    // Console context descriptor for calls on non-default console context (not console.*): 'anonymous#unique-logger-id' for call on unnamed context, 'name#unique-logger-id' for call on named context.
 }
 
-// InspectRequestedClient receives InspectRequested events.
+// InspectRequestedClient is a client for InspectRequested events. Issued when object should be inspected (for example, as a result of inspect() command line API call).
 type InspectRequestedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -99,7 +99,7 @@ type InspectRequestedClient interface {
 	rpcc.Stream
 }
 
-// InspectRequestedReply issued when object should be inspected (for example, as a result of inspect() command line API call).
+// InspectRequestedReply is the reply for InspectRequested events.
 type InspectRequestedReply struct {
 	Object RemoteObject    `json:"object"` //
 	Hints  json.RawMessage `json:"hints"`  //

@@ -7,7 +7,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// ConsoleProfileStartedClient receives ConsoleProfileStarted events.
+// ConsoleProfileStartedClient is a client for ConsoleProfileStarted events. Sent when new profile recording is started using console.profile() call.
 type ConsoleProfileStartedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -15,14 +15,14 @@ type ConsoleProfileStartedClient interface {
 	rpcc.Stream
 }
 
-// ConsoleProfileStartedReply sent when new profile recording is started using console.profile() call.
+// ConsoleProfileStartedReply is the reply for ConsoleProfileStarted events.
 type ConsoleProfileStartedReply struct {
 	ID       string            `json:"id"`              //
 	Location debugger.Location `json:"location"`        // Location of console.profile().
 	Title    *string           `json:"title,omitempty"` // Profile title passed as an argument to console.profile().
 }
 
-// ConsoleProfileFinishedClient receives ConsoleProfileFinished events.
+// ConsoleProfileFinishedClient is a client for ConsoleProfileFinished events.
 type ConsoleProfileFinishedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -30,7 +30,7 @@ type ConsoleProfileFinishedClient interface {
 	rpcc.Stream
 }
 
-// ConsoleProfileFinishedReply
+// ConsoleProfileFinishedReply is the reply for ConsoleProfileFinished events.
 type ConsoleProfileFinishedReply struct {
 	ID       string            `json:"id"`              //
 	Location debugger.Location `json:"location"`        // Location of console.profileEnd().

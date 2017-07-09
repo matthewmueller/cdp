@@ -7,7 +7,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// NodeHighlightRequestedClient receives NodeHighlightRequested events.
+// NodeHighlightRequestedClient is a client for NodeHighlightRequested events. Fired when the node should be highlighted. This happens after call to setInspectMode.
 type NodeHighlightRequestedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -15,12 +15,12 @@ type NodeHighlightRequestedClient interface {
 	rpcc.Stream
 }
 
-// NodeHighlightRequestedReply fired when the node should be highlighted. This happens after call to setInspectMode.
+// NodeHighlightRequestedReply is the reply for NodeHighlightRequested events.
 type NodeHighlightRequestedReply struct {
 	NodeID dom.NodeID `json:"nodeId"` //
 }
 
-// InspectNodeRequestedClient receives InspectNodeRequested events.
+// InspectNodeRequestedClient is a client for InspectNodeRequested events. Fired when the node should be inspected. This happens after call to setInspectMode or when user manually inspects an element.
 type InspectNodeRequestedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -28,7 +28,7 @@ type InspectNodeRequestedClient interface {
 	rpcc.Stream
 }
 
-// InspectNodeRequestedReply fired when the node should be inspected. This happens after call to setInspectMode or when user manually inspects an element.
+// InspectNodeRequestedReply is the reply for InspectNodeRequested events.
 type InspectNodeRequestedReply struct {
 	BackendNodeID dom.BackendNodeID `json:"backendNodeId"` // Id of the node to inspect.
 }

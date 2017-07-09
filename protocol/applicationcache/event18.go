@@ -9,14 +9,14 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// StatusUpdatedReply
+// StatusUpdatedReply is the reply for ApplicationCacheStatusUpdated events.
 type StatusUpdatedReply struct {
 	FrameID     protocol.PageFrameID `json:"frameId"`     // Identifier of the frame containing document whose application cache updated status.
 	ManifestURL string               `json:"manifestURL"` // Manifest URL.
 	Status      int                  `json:"status"`      // Updated application cache status.
 }
 
-// NetworkStateUpdatedClient receives NetworkStateUpdated events.
+// NetworkStateUpdatedClient is a client for NetworkStateUpdated events.
 type NetworkStateUpdatedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.

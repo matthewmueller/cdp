@@ -6,7 +6,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// VirtualTimeBudgetExpiredClient receives VirtualTimeBudgetExpired events.
+// VirtualTimeBudgetExpiredClient is a client for VirtualTimeBudgetExpired events. Notification sent after the virual time budget for the current VirtualTimePolicy has run out.
 type VirtualTimeBudgetExpiredClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -14,5 +14,5 @@ type VirtualTimeBudgetExpiredClient interface {
 	rpcc.Stream
 }
 
-// VirtualTimeBudgetExpiredReply notification sent after the virual time budget for the current VirtualTimePolicy has run out.
+// VirtualTimeBudgetExpiredReply is the reply for VirtualTimeBudgetExpired events.
 type VirtualTimeBudgetExpiredReply struct{}

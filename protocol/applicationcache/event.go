@@ -6,7 +6,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// StatusUpdatedClient receives ApplicationCacheStatusUpdated events.
+// StatusUpdatedClient is a client for ApplicationCacheStatusUpdated events.
 type StatusUpdatedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -14,7 +14,7 @@ type StatusUpdatedClient interface {
 	rpcc.Stream
 }
 
-// NetworkStateUpdatedReply
+// NetworkStateUpdatedReply is the reply for NetworkStateUpdated events.
 type NetworkStateUpdatedReply struct {
 	IsNowOnline bool `json:"isNowOnline"` //
 }

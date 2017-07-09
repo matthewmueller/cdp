@@ -6,7 +6,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// AddHeapSnapshotChunkClient receives AddHeapSnapshotChunk events.
+// AddHeapSnapshotChunkClient is a client for AddHeapSnapshotChunk events.
 type AddHeapSnapshotChunkClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -14,12 +14,12 @@ type AddHeapSnapshotChunkClient interface {
 	rpcc.Stream
 }
 
-// AddHeapSnapshotChunkReply
+// AddHeapSnapshotChunkReply is the reply for AddHeapSnapshotChunk events.
 type AddHeapSnapshotChunkReply struct {
 	Chunk string `json:"chunk"` //
 }
 
-// ResetProfilesClient receives ResetProfiles events.
+// ResetProfilesClient is a client for ResetProfiles events.
 type ResetProfilesClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -27,10 +27,10 @@ type ResetProfilesClient interface {
 	rpcc.Stream
 }
 
-// ResetProfilesReply
+// ResetProfilesReply is the reply for ResetProfiles events.
 type ResetProfilesReply struct{}
 
-// ReportHeapSnapshotProgressClient receives ReportHeapSnapshotProgress events.
+// ReportHeapSnapshotProgressClient is a client for ReportHeapSnapshotProgress events.
 type ReportHeapSnapshotProgressClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -38,14 +38,14 @@ type ReportHeapSnapshotProgressClient interface {
 	rpcc.Stream
 }
 
-// ReportHeapSnapshotProgressReply
+// ReportHeapSnapshotProgressReply is the reply for ReportHeapSnapshotProgress events.
 type ReportHeapSnapshotProgressReply struct {
 	Done     int   `json:"done"`               //
 	Total    int   `json:"total"`              //
 	Finished *bool `json:"finished,omitempty"` //
 }
 
-// LastSeenObjectIDClient receives LastSeenObjectID events.
+// LastSeenObjectIDClient is a client for LastSeenObjectID events. If heap objects tracking has been started then backend regularly sends a current value for last seen object id and corresponding timestamp. If the were changes in the heap since last event then one or more heapStatsUpdate events will be sent before a new lastSeenObjectId event.
 type LastSeenObjectIDClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -53,13 +53,13 @@ type LastSeenObjectIDClient interface {
 	rpcc.Stream
 }
 
-// LastSeenObjectIDReply if heap objects tracking has been started then backend regularly sends a current value for last seen object id and corresponding timestamp. If the were changes in the heap since last event then one or more heapStatsUpdate events will be sent before a new lastSeenObjectId event.
+// LastSeenObjectIDReply is the reply for LastSeenObjectID events.
 type LastSeenObjectIDReply struct {
 	LastSeenObjectID int     `json:"lastSeenObjectId"` //
 	Timestamp        float64 `json:"timestamp"`        //
 }
 
-// HeapStatsUpdateClient receives HeapStatsUpdate events.
+// HeapStatsUpdateClient is a client for HeapStatsUpdate events. If heap objects tracking has been started then backend may send update for one or more fragments
 type HeapStatsUpdateClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -67,7 +67,7 @@ type HeapStatsUpdateClient interface {
 	rpcc.Stream
 }
 
-// HeapStatsUpdateReply if heap objects tracking has been started then backend may send update for one or more fragments
+// HeapStatsUpdateReply is the reply for HeapStatsUpdate events.
 type HeapStatsUpdateReply struct {
 	StatsUpdate []int `json:"statsUpdate"` // An array of triplets. Each triplet describes a fragment. The first integer is the fragment index, the second integer is a total count of objects for the fragment, the third integer is a total size of the objects for the fragment.
 }

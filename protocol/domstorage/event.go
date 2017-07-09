@@ -6,7 +6,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// ItemsClearedClient receives DOMStorageItemsCleared events.
+// ItemsClearedClient is a client for DOMStorageItemsCleared events.
 type ItemsClearedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -14,12 +14,12 @@ type ItemsClearedClient interface {
 	rpcc.Stream
 }
 
-// ItemsClearedReply
+// ItemsClearedReply is the reply for DOMStorageItemsCleared events.
 type ItemsClearedReply struct {
 	StorageID StorageID `json:"storageId"` //
 }
 
-// ItemRemovedClient receives DOMStorageItemRemoved events.
+// ItemRemovedClient is a client for DOMStorageItemRemoved events.
 type ItemRemovedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -27,13 +27,13 @@ type ItemRemovedClient interface {
 	rpcc.Stream
 }
 
-// ItemRemovedReply
+// ItemRemovedReply is the reply for DOMStorageItemRemoved events.
 type ItemRemovedReply struct {
 	StorageID StorageID `json:"storageId"` //
 	Key       string    `json:"key"`       //
 }
 
-// ItemAddedClient receives DOMStorageItemAdded events.
+// ItemAddedClient is a client for DOMStorageItemAdded events.
 type ItemAddedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -41,14 +41,14 @@ type ItemAddedClient interface {
 	rpcc.Stream
 }
 
-// ItemAddedReply
+// ItemAddedReply is the reply for DOMStorageItemAdded events.
 type ItemAddedReply struct {
 	StorageID StorageID `json:"storageId"` //
 	Key       string    `json:"key"`       //
 	NewValue  string    `json:"newValue"`  //
 }
 
-// ItemUpdatedClient receives DOMStorageItemUpdated events.
+// ItemUpdatedClient is a client for DOMStorageItemUpdated events.
 type ItemUpdatedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -56,7 +56,7 @@ type ItemUpdatedClient interface {
 	rpcc.Stream
 }
 
-// ItemUpdatedReply
+// ItemUpdatedReply is the reply for DOMStorageItemUpdated events.
 type ItemUpdatedReply struct {
 	StorageID StorageID `json:"storageId"` //
 	Key       string    `json:"key"`       //

@@ -9,7 +9,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// RequestWillBeSentReply fired when page is about to send HTTP request.
+// RequestWillBeSentReply is the reply for RequestWillBeSent events.
 type RequestWillBeSentReply struct {
 	RequestID        RequestID                  `json:"requestId"`                  // Request identifier.
 	LoaderID         LoaderID                   `json:"loaderId"`                   // Loader identifier. Empty string if the request is fetched form worker.
@@ -23,7 +23,7 @@ type RequestWillBeSentReply struct {
 	FrameID          *protocol.PageFrameID      `json:"frameId,omitempty"`          // Frame identifier.
 }
 
-// RequestServedFromCacheClient receives RequestServedFromCache events.
+// RequestServedFromCacheClient is a client for RequestServedFromCache events. Fired if request ended up loading from cache.
 type RequestServedFromCacheClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -31,7 +31,7 @@ type RequestServedFromCacheClient interface {
 	rpcc.Stream
 }
 
-// ResponseReceivedReply fired when HTTP response is available.
+// ResponseReceivedReply is the reply for ResponseReceived events.
 type ResponseReceivedReply struct {
 	RequestID RequestID                 `json:"requestId"`         // Request identifier.
 	LoaderID  LoaderID                  `json:"loaderId"`          // Loader identifier. Empty string if the request is fetched form worker.
@@ -41,7 +41,7 @@ type ResponseReceivedReply struct {
 	FrameID   *protocol.PageFrameID     `json:"frameId,omitempty"` // Frame identifier.
 }
 
-// DataReceivedClient receives DataReceived events.
+// DataReceivedClient is a client for DataReceived events. Fired when data chunk was received over the network.
 type DataReceivedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -49,7 +49,7 @@ type DataReceivedClient interface {
 	rpcc.Stream
 }
 
-// LoadingFailedReply fired when HTTP request has failed to load.
+// LoadingFailedReply is the reply for LoadingFailed events.
 type LoadingFailedReply struct {
 	RequestID     RequestID                 `json:"requestId"`               // Request identifier.
 	Timestamp     MonotonicTime             `json:"timestamp"`               // Timestamp.
@@ -59,7 +59,7 @@ type LoadingFailedReply struct {
 	BlockedReason BlockedReason             `json:"blockedReason,omitempty"` // The reason why loading was blocked, if any.
 }
 
-// WebSocketWillSendHandshakeRequestClient receives WebSocketWillSendHandshakeRequest events.
+// WebSocketWillSendHandshakeRequestClient is a client for WebSocketWillSendHandshakeRequest events. Fired when WebSocket is about to initiate handshake.
 type WebSocketWillSendHandshakeRequestClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -67,7 +67,7 @@ type WebSocketWillSendHandshakeRequestClient interface {
 	rpcc.Stream
 }
 
-// RequestInterceptedReply details of an intercepted HTTP request, which must be either allowed, blocked, modified or mocked.
+// RequestInterceptedReply is the reply for RequestIntercepted events.
 type RequestInterceptedReply struct {
 	InterceptionID     InterceptionID            `json:"interceptionId"`               // Each request the page makes will have a unique id, however if any redirects are encountered while processing that fetch, they will be reported with the same id as the original fetch. Likewise if HTTP authentication is needed then the same fetch id will be used.
 	Request            Request                   `json:"request"`                      //

@@ -6,7 +6,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// EntryAddedClient receives EntryAdded events.
+// EntryAddedClient is a client for EntryAdded events. Issued when new message was logged.
 type EntryAddedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -14,7 +14,7 @@ type EntryAddedClient interface {
 	rpcc.Stream
 }
 
-// EntryAddedReply issued when new message was logged.
+// EntryAddedReply is the reply for EntryAdded events.
 type EntryAddedReply struct {
 	Entry Entry `json:"entry"` // The entry.
 }

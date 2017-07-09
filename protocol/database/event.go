@@ -6,7 +6,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// AddDatabaseClient receives AddDatabase events.
+// AddDatabaseClient is a client for AddDatabase events.
 type AddDatabaseClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -14,7 +14,7 @@ type AddDatabaseClient interface {
 	rpcc.Stream
 }
 
-// AddDatabaseReply
+// AddDatabaseReply is the reply for AddDatabase events.
 type AddDatabaseReply struct {
 	Database Database `json:"database"` //
 }

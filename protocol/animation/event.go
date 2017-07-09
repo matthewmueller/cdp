@@ -6,7 +6,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// CreatedClient receives AnimationCreated events.
+// CreatedClient is a client for AnimationCreated events. Event for each animation that has been created.
 type CreatedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -14,12 +14,12 @@ type CreatedClient interface {
 	rpcc.Stream
 }
 
-// CreatedReply event for each animation that has been created.
+// CreatedReply is the reply for AnimationCreated events.
 type CreatedReply struct {
 	ID string `json:"id"` // Id of the animation that was created.
 }
 
-// StartedClient receives AnimationStarted events.
+// StartedClient is a client for AnimationStarted events. Event for animation that has been started.
 type StartedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -27,12 +27,12 @@ type StartedClient interface {
 	rpcc.Stream
 }
 
-// StartedReply event for animation that has been started.
+// StartedReply is the reply for AnimationStarted events.
 type StartedReply struct {
 	Animation Animation `json:"animation"` // Animation that was started.
 }
 
-// CanceledClient receives AnimationCanceled events.
+// CanceledClient is a client for AnimationCanceled events. Event for when an animation has been canceled.
 type CanceledClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -40,7 +40,7 @@ type CanceledClient interface {
 	rpcc.Stream
 }
 
-// CanceledReply event for when an animation has been canceled.
+// CanceledReply is the reply for AnimationCanceled events.
 type CanceledReply struct {
 	ID string `json:"id"` // Id of the animation that was canceled.
 }

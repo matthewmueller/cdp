@@ -6,7 +6,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// ResourceChangedPriorityClient receives ResourceChangedPriority events.
+// ResourceChangedPriorityClient is a client for ResourceChangedPriority events. Fired when resource loading priority is changed
 type ResourceChangedPriorityClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -14,14 +14,14 @@ type ResourceChangedPriorityClient interface {
 	rpcc.Stream
 }
 
-// ResourceChangedPriorityReply fired when resource loading priority is changed
+// ResourceChangedPriorityReply is the reply for ResourceChangedPriority events.
 type ResourceChangedPriorityReply struct {
 	RequestID   RequestID        `json:"requestId"`   // Request identifier.
 	NewPriority ResourcePriority `json:"newPriority"` // New priority
 	Timestamp   MonotonicTime    `json:"timestamp"`   // Timestamp.
 }
 
-// RequestWillBeSentClient receives RequestWillBeSent events.
+// RequestWillBeSentClient is a client for RequestWillBeSent events. Fired when page is about to send HTTP request.
 type RequestWillBeSentClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -29,12 +29,12 @@ type RequestWillBeSentClient interface {
 	rpcc.Stream
 }
 
-// RequestServedFromCacheReply fired if request ended up loading from cache.
+// RequestServedFromCacheReply is the reply for RequestServedFromCache events.
 type RequestServedFromCacheReply struct {
 	RequestID RequestID `json:"requestId"` // Request identifier.
 }
 
-// ResponseReceivedClient receives ResponseReceived events.
+// ResponseReceivedClient is a client for ResponseReceived events. Fired when HTTP response is available.
 type ResponseReceivedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -42,7 +42,7 @@ type ResponseReceivedClient interface {
 	rpcc.Stream
 }
 
-// DataReceivedReply fired when data chunk was received over the network.
+// DataReceivedReply is the reply for DataReceived events.
 type DataReceivedReply struct {
 	RequestID         RequestID     `json:"requestId"`         // Request identifier.
 	Timestamp         MonotonicTime `json:"timestamp"`         // Timestamp.
@@ -50,7 +50,7 @@ type DataReceivedReply struct {
 	EncodedDataLength int           `json:"encodedDataLength"` // Actual bytes received (might be less than dataLength for compressed encodings).
 }
 
-// LoadingFinishedClient receives LoadingFinished events.
+// LoadingFinishedClient is a client for LoadingFinished events. Fired when HTTP request has finished loading.
 type LoadingFinishedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -58,14 +58,14 @@ type LoadingFinishedClient interface {
 	rpcc.Stream
 }
 
-// LoadingFinishedReply fired when HTTP request has finished loading.
+// LoadingFinishedReply is the reply for LoadingFinished events.
 type LoadingFinishedReply struct {
 	RequestID         RequestID     `json:"requestId"`         // Request identifier.
 	Timestamp         MonotonicTime `json:"timestamp"`         // Timestamp.
 	EncodedDataLength float64       `json:"encodedDataLength"` // Total number of bytes received for this request.
 }
 
-// LoadingFailedClient receives LoadingFailed events.
+// LoadingFailedClient is a client for LoadingFailed events. Fired when HTTP request has failed to load.
 type LoadingFailedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -73,7 +73,7 @@ type LoadingFailedClient interface {
 	rpcc.Stream
 }
 
-// WebSocketWillSendHandshakeRequestReply fired when WebSocket is about to initiate handshake.
+// WebSocketWillSendHandshakeRequestReply is the reply for WebSocketWillSendHandshakeRequest events.
 type WebSocketWillSendHandshakeRequestReply struct {
 	RequestID RequestID        `json:"requestId"` // Request identifier.
 	Timestamp MonotonicTime    `json:"timestamp"` // Timestamp.
@@ -81,7 +81,7 @@ type WebSocketWillSendHandshakeRequestReply struct {
 	Request   WebSocketRequest `json:"request"`   // WebSocket request data.
 }
 
-// WebSocketHandshakeResponseReceivedClient receives WebSocketHandshakeResponseReceived events.
+// WebSocketHandshakeResponseReceivedClient is a client for WebSocketHandshakeResponseReceived events. Fired when WebSocket handshake response becomes available.
 type WebSocketHandshakeResponseReceivedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -89,14 +89,14 @@ type WebSocketHandshakeResponseReceivedClient interface {
 	rpcc.Stream
 }
 
-// WebSocketHandshakeResponseReceivedReply fired when WebSocket handshake response becomes available.
+// WebSocketHandshakeResponseReceivedReply is the reply for WebSocketHandshakeResponseReceived events.
 type WebSocketHandshakeResponseReceivedReply struct {
 	RequestID RequestID         `json:"requestId"` // Request identifier.
 	Timestamp MonotonicTime     `json:"timestamp"` // Timestamp.
 	Response  WebSocketResponse `json:"response"`  // WebSocket response data.
 }
 
-// WebSocketCreatedClient receives WebSocketCreated events.
+// WebSocketCreatedClient is a client for WebSocketCreated events. Fired upon WebSocket creation.
 type WebSocketCreatedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -104,14 +104,14 @@ type WebSocketCreatedClient interface {
 	rpcc.Stream
 }
 
-// WebSocketCreatedReply fired upon WebSocket creation.
+// WebSocketCreatedReply is the reply for WebSocketCreated events.
 type WebSocketCreatedReply struct {
 	RequestID RequestID  `json:"requestId"`           // Request identifier.
 	URL       string     `json:"url"`                 // WebSocket request URL.
 	Initiator *Initiator `json:"initiator,omitempty"` // Request initiator.
 }
 
-// WebSocketClosedClient receives WebSocketClosed events.
+// WebSocketClosedClient is a client for WebSocketClosed events. Fired when WebSocket is closed.
 type WebSocketClosedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -119,13 +119,13 @@ type WebSocketClosedClient interface {
 	rpcc.Stream
 }
 
-// WebSocketClosedReply fired when WebSocket is closed.
+// WebSocketClosedReply is the reply for WebSocketClosed events.
 type WebSocketClosedReply struct {
 	RequestID RequestID     `json:"requestId"` // Request identifier.
 	Timestamp MonotonicTime `json:"timestamp"` // Timestamp.
 }
 
-// WebSocketFrameReceivedClient receives WebSocketFrameReceived events.
+// WebSocketFrameReceivedClient is a client for WebSocketFrameReceived events. Fired when WebSocket frame is received.
 type WebSocketFrameReceivedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -133,14 +133,14 @@ type WebSocketFrameReceivedClient interface {
 	rpcc.Stream
 }
 
-// WebSocketFrameReceivedReply fired when WebSocket frame is received.
+// WebSocketFrameReceivedReply is the reply for WebSocketFrameReceived events.
 type WebSocketFrameReceivedReply struct {
 	RequestID RequestID      `json:"requestId"` // Request identifier.
 	Timestamp MonotonicTime  `json:"timestamp"` // Timestamp.
 	Response  WebSocketFrame `json:"response"`  // WebSocket response data.
 }
 
-// WebSocketFrameErrorClient receives WebSocketFrameError events.
+// WebSocketFrameErrorClient is a client for WebSocketFrameError events. Fired when WebSocket frame error occurs.
 type WebSocketFrameErrorClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -148,14 +148,14 @@ type WebSocketFrameErrorClient interface {
 	rpcc.Stream
 }
 
-// WebSocketFrameErrorReply fired when WebSocket frame error occurs.
+// WebSocketFrameErrorReply is the reply for WebSocketFrameError events.
 type WebSocketFrameErrorReply struct {
 	RequestID    RequestID     `json:"requestId"`    // Request identifier.
 	Timestamp    MonotonicTime `json:"timestamp"`    // Timestamp.
 	ErrorMessage string        `json:"errorMessage"` // WebSocket frame error message.
 }
 
-// WebSocketFrameSentClient receives WebSocketFrameSent events.
+// WebSocketFrameSentClient is a client for WebSocketFrameSent events. Fired when WebSocket frame is sent.
 type WebSocketFrameSentClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -163,14 +163,14 @@ type WebSocketFrameSentClient interface {
 	rpcc.Stream
 }
 
-// WebSocketFrameSentReply fired when WebSocket frame is sent.
+// WebSocketFrameSentReply is the reply for WebSocketFrameSent events.
 type WebSocketFrameSentReply struct {
 	RequestID RequestID      `json:"requestId"` // Request identifier.
 	Timestamp MonotonicTime  `json:"timestamp"` // Timestamp.
 	Response  WebSocketFrame `json:"response"`  // WebSocket response data.
 }
 
-// EventSourceMessageReceivedClient receives EventSourceMessageReceived events.
+// EventSourceMessageReceivedClient is a client for EventSourceMessageReceived events. Fired when EventSource message is received.
 type EventSourceMessageReceivedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -178,7 +178,7 @@ type EventSourceMessageReceivedClient interface {
 	rpcc.Stream
 }
 
-// EventSourceMessageReceivedReply fired when EventSource message is received.
+// EventSourceMessageReceivedReply is the reply for EventSourceMessageReceived events.
 type EventSourceMessageReceivedReply struct {
 	RequestID RequestID     `json:"requestId"` // Request identifier.
 	Timestamp MonotonicTime `json:"timestamp"` // Timestamp.
@@ -187,7 +187,7 @@ type EventSourceMessageReceivedReply struct {
 	Data      string        `json:"data"`      // Message content.
 }
 
-// RequestInterceptedClient receives RequestIntercepted events.
+// RequestInterceptedClient is a client for RequestIntercepted events. Details of an intercepted HTTP request, which must be either allowed, blocked, modified or mocked.
 type RequestInterceptedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.

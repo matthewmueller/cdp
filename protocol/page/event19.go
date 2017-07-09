@@ -9,14 +9,14 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// FrameAttachedReply fired when frame has been attached to its parent.
+// FrameAttachedReply is the reply for FrameAttached events.
 type FrameAttachedReply struct {
 	FrameID       FrameID             `json:"frameId"`         // Id of the frame that has been attached.
 	ParentFrameID FrameID             `json:"parentFrameId"`   // Parent frame identifier.
 	Stack         *runtime.StackTrace `json:"stack,omitempty"` // JavaScript stack trace of when frame was attached, only set if frame initiated from script.
 }
 
-// FrameNavigatedClient receives FrameNavigated events.
+// FrameNavigatedClient is a client for FrameNavigated events. Fired once navigation of the frame has completed. Frame is now associated with the new loader.
 type FrameNavigatedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -24,12 +24,12 @@ type FrameNavigatedClient interface {
 	rpcc.Stream
 }
 
-// FrameDetachedReply fired when frame has been detached from its parent.
+// FrameDetachedReply is the reply for FrameDetached events.
 type FrameDetachedReply struct {
 	FrameID FrameID `json:"frameId"` // Id of the frame that has been detached.
 }
 
-// FrameStartedLoadingClient receives FrameStartedLoading events.
+// FrameStartedLoadingClient is a client for FrameStartedLoading events. Fired when frame has started loading.
 type FrameStartedLoadingClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -37,12 +37,12 @@ type FrameStartedLoadingClient interface {
 	rpcc.Stream
 }
 
-// FrameStartedLoadingReply fired when frame has started loading.
+// FrameStartedLoadingReply is the reply for FrameStartedLoading events.
 type FrameStartedLoadingReply struct {
 	FrameID FrameID `json:"frameId"` // Id of the frame that has started loading.
 }
 
-// FrameStoppedLoadingClient receives FrameStoppedLoading events.
+// FrameStoppedLoadingClient is a client for FrameStoppedLoading events. Fired when frame has stopped loading.
 type FrameStoppedLoadingClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -50,12 +50,12 @@ type FrameStoppedLoadingClient interface {
 	rpcc.Stream
 }
 
-// FrameStoppedLoadingReply fired when frame has stopped loading.
+// FrameStoppedLoadingReply is the reply for FrameStoppedLoading events.
 type FrameStoppedLoadingReply struct {
 	FrameID FrameID `json:"frameId"` // Id of the frame that has stopped loading.
 }
 
-// FrameScheduledNavigationClient receives FrameScheduledNavigation events.
+// FrameScheduledNavigationClient is a client for FrameScheduledNavigation events. Fired when frame schedules a potential navigation.
 type FrameScheduledNavigationClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -63,13 +63,13 @@ type FrameScheduledNavigationClient interface {
 	rpcc.Stream
 }
 
-// FrameScheduledNavigationReply fired when frame schedules a potential navigation.
+// FrameScheduledNavigationReply is the reply for FrameScheduledNavigation events.
 type FrameScheduledNavigationReply struct {
 	FrameID FrameID `json:"frameId"` // Id of the frame that has scheduled a navigation.
 	Delay   float64 `json:"delay"`   // Delay (in seconds) until the navigation is scheduled to begin. The navigation is not guaranteed to start.
 }
 
-// FrameClearedScheduledNavigationClient receives FrameClearedScheduledNavigation events.
+// FrameClearedScheduledNavigationClient is a client for FrameClearedScheduledNavigation events. Fired when frame no longer has a scheduled navigation.
 type FrameClearedScheduledNavigationClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -77,12 +77,12 @@ type FrameClearedScheduledNavigationClient interface {
 	rpcc.Stream
 }
 
-// FrameClearedScheduledNavigationReply fired when frame no longer has a scheduled navigation.
+// FrameClearedScheduledNavigationReply is the reply for FrameClearedScheduledNavigation events.
 type FrameClearedScheduledNavigationReply struct {
 	FrameID FrameID `json:"frameId"` // Id of the frame that has cleared its scheduled navigation.
 }
 
-// FrameResizedClient receives FrameResized events.
+// FrameResizedClient is a client for FrameResized events.
 type FrameResizedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.

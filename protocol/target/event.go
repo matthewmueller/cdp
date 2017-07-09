@@ -6,7 +6,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// CreatedClient receives TargetCreated events.
+// CreatedClient is a client for TargetCreated events. Issued when a possible inspection target is created.
 type CreatedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -14,12 +14,12 @@ type CreatedClient interface {
 	rpcc.Stream
 }
 
-// CreatedReply issued when a possible inspection target is created.
+// CreatedReply is the reply for TargetCreated events.
 type CreatedReply struct {
 	TargetInfo Info `json:"targetInfo"` //
 }
 
-// InfoChangedClient receives TargetInfoChanged events.
+// InfoChangedClient is a client for TargetInfoChanged events. Issued when some information about a target has changed. This only happens between targetCreated and targetDestroyed.
 type InfoChangedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -27,12 +27,12 @@ type InfoChangedClient interface {
 	rpcc.Stream
 }
 
-// InfoChangedReply issued when some information about a target has changed. This only happens between targetCreated and targetDestroyed.
+// InfoChangedReply is the reply for TargetInfoChanged events.
 type InfoChangedReply struct {
 	TargetInfo Info `json:"targetInfo"` //
 }
 
-// DestroyedClient receives TargetDestroyed events.
+// DestroyedClient is a client for TargetDestroyed events. Issued when a target is destroyed.
 type DestroyedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -40,12 +40,12 @@ type DestroyedClient interface {
 	rpcc.Stream
 }
 
-// DestroyedReply issued when a target is destroyed.
+// DestroyedReply is the reply for TargetDestroyed events.
 type DestroyedReply struct {
 	TargetID ID `json:"targetId"` //
 }
 
-// AttachedToTargetClient receives AttachedToTarget events.
+// AttachedToTargetClient is a client for AttachedToTarget events. Issued when attached to target because of auto-attach or attachToTarget command.
 type AttachedToTargetClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -53,13 +53,13 @@ type AttachedToTargetClient interface {
 	rpcc.Stream
 }
 
-// AttachedToTargetReply issued when attached to target because of auto-attach or attachToTarget command.
+// AttachedToTargetReply is the reply for AttachedToTarget events.
 type AttachedToTargetReply struct {
 	TargetInfo         Info `json:"targetInfo"`         //
 	WaitingForDebugger bool `json:"waitingForDebugger"` //
 }
 
-// DetachedFromTargetClient receives DetachedFromTarget events.
+// DetachedFromTargetClient is a client for DetachedFromTarget events. Issued when detached from target for any reason (including detachFromTarget command).
 type DetachedFromTargetClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -67,12 +67,12 @@ type DetachedFromTargetClient interface {
 	rpcc.Stream
 }
 
-// DetachedFromTargetReply issued when detached from target for any reason (including detachFromTarget command).
+// DetachedFromTargetReply is the reply for DetachedFromTarget events.
 type DetachedFromTargetReply struct {
 	TargetID ID `json:"targetId"` //
 }
 
-// ReceivedMessageFromTargetClient receives ReceivedMessageFromTarget events.
+// ReceivedMessageFromTargetClient is a client for ReceivedMessageFromTarget events. Notifies about new protocol message from attached target.
 type ReceivedMessageFromTargetClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -80,7 +80,7 @@ type ReceivedMessageFromTargetClient interface {
 	rpcc.Stream
 }
 
-// ReceivedMessageFromTargetReply notifies about new protocol message from attached target.
+// ReceivedMessageFromTargetReply is the reply for ReceivedMessageFromTarget events.
 type ReceivedMessageFromTargetReply struct {
 	TargetID ID     `json:"targetId"` //
 	Message  string `json:"message"`  //

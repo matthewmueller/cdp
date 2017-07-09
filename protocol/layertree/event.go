@@ -7,7 +7,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// DidChangeClient receives LayerTreeDidChange events.
+// DidChangeClient is a client for LayerTreeDidChange events.
 type DidChangeClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -15,12 +15,12 @@ type DidChangeClient interface {
 	rpcc.Stream
 }
 
-// DidChangeReply
+// DidChangeReply is the reply for LayerTreeDidChange events.
 type DidChangeReply struct {
 	Layers []Layer `json:"layers,omitempty"` // Layer tree, absent if not in the comspositing mode.
 }
 
-// LayerPaintedClient receives LayerPainted events.
+// LayerPaintedClient is a client for LayerPainted events.
 type LayerPaintedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -28,7 +28,7 @@ type LayerPaintedClient interface {
 	rpcc.Stream
 }
 
-// LayerPaintedReply
+// LayerPaintedReply is the reply for LayerPainted events.
 type LayerPaintedReply struct {
 	LayerID LayerID  `json:"layerId"` // The id of the painted layer.
 	Clip    dom.Rect `json:"clip"`    // Clip rectangle.

@@ -7,7 +7,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// DOMContentEventFiredClient receives DOMContentEventFired events.
+// DOMContentEventFiredClient is a client for DOMContentEventFired events.
 type DOMContentEventFiredClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -15,12 +15,12 @@ type DOMContentEventFiredClient interface {
 	rpcc.Stream
 }
 
-// DOMContentEventFiredReply
+// DOMContentEventFiredReply is the reply for DOMContentEventFired events.
 type DOMContentEventFiredReply struct {
 	Timestamp network.MonotonicTime `json:"timestamp"` //
 }
 
-// LoadEventFiredClient receives LoadEventFired events.
+// LoadEventFiredClient is a client for LoadEventFired events.
 type LoadEventFiredClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -28,12 +28,12 @@ type LoadEventFiredClient interface {
 	rpcc.Stream
 }
 
-// LoadEventFiredReply
+// LoadEventFiredReply is the reply for LoadEventFired events.
 type LoadEventFiredReply struct {
 	Timestamp network.MonotonicTime `json:"timestamp"` //
 }
 
-// FrameAttachedClient receives FrameAttached events.
+// FrameAttachedClient is a client for FrameAttached events. Fired when frame has been attached to its parent.
 type FrameAttachedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -41,12 +41,12 @@ type FrameAttachedClient interface {
 	rpcc.Stream
 }
 
-// FrameNavigatedReply fired once navigation of the frame has completed. Frame is now associated with the new loader.
+// FrameNavigatedReply is the reply for FrameNavigated events.
 type FrameNavigatedReply struct {
 	Frame Frame `json:"frame"` // Frame object.
 }
 
-// FrameDetachedClient receives FrameDetached events.
+// FrameDetachedClient is a client for FrameDetached events. Fired when frame has been detached from its parent.
 type FrameDetachedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -54,10 +54,10 @@ type FrameDetachedClient interface {
 	rpcc.Stream
 }
 
-// FrameResizedReply
+// FrameResizedReply is the reply for FrameResized events.
 type FrameResizedReply struct{}
 
-// JavascriptDialogOpeningClient receives JavascriptDialogOpening events.
+// JavascriptDialogOpeningClient is a client for JavascriptDialogOpening events. Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) is about to open.
 type JavascriptDialogOpeningClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -65,13 +65,13 @@ type JavascriptDialogOpeningClient interface {
 	rpcc.Stream
 }
 
-// JavascriptDialogOpeningReply fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) is about to open.
+// JavascriptDialogOpeningReply is the reply for JavascriptDialogOpening events.
 type JavascriptDialogOpeningReply struct {
 	Message string     `json:"message"` // Message that will be displayed by the dialog.
 	Type    DialogType `json:"type"`    // Dialog type.
 }
 
-// JavascriptDialogClosedClient receives JavascriptDialogClosed events.
+// JavascriptDialogClosedClient is a client for JavascriptDialogClosed events. Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) has been closed.
 type JavascriptDialogClosedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -79,12 +79,12 @@ type JavascriptDialogClosedClient interface {
 	rpcc.Stream
 }
 
-// JavascriptDialogClosedReply fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) has been closed.
+// JavascriptDialogClosedReply is the reply for JavascriptDialogClosed events.
 type JavascriptDialogClosedReply struct {
 	Result bool `json:"result"` // Whether dialog was confirmed.
 }
 
-// ScreencastFrameClient receives ScreencastFrame events.
+// ScreencastFrameClient is a client for ScreencastFrame events. Compressed image data requested by the startScreencast.
 type ScreencastFrameClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -92,14 +92,14 @@ type ScreencastFrameClient interface {
 	rpcc.Stream
 }
 
-// ScreencastFrameReply compressed image data requested by the startScreencast.
+// ScreencastFrameReply is the reply for ScreencastFrame events.
 type ScreencastFrameReply struct {
 	Data      []byte                  `json:"data"`      // Base64-encoded compressed image.
 	Metadata  ScreencastFrameMetadata `json:"metadata"`  // Screencast frame metadata.
 	SessionID int                     `json:"sessionId"` // Frame number.
 }
 
-// ScreencastVisibilityChangedClient receives ScreencastVisibilityChanged events.
+// ScreencastVisibilityChangedClient is a client for ScreencastVisibilityChanged events. Fired when the page with currently enabled screencast was shown or hidden .
 type ScreencastVisibilityChangedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -107,12 +107,12 @@ type ScreencastVisibilityChangedClient interface {
 	rpcc.Stream
 }
 
-// ScreencastVisibilityChangedReply fired when the page with currently enabled screencast was shown or hidden .
+// ScreencastVisibilityChangedReply is the reply for ScreencastVisibilityChanged events.
 type ScreencastVisibilityChangedReply struct {
 	Visible bool `json:"visible"` // True if the page is visible.
 }
 
-// InterstitialShownClient receives InterstitialShown events.
+// InterstitialShownClient is a client for InterstitialShown events. Fired when interstitial page was shown
 type InterstitialShownClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -120,10 +120,10 @@ type InterstitialShownClient interface {
 	rpcc.Stream
 }
 
-// InterstitialShownReply fired when interstitial page was shown
+// InterstitialShownReply is the reply for InterstitialShown events.
 type InterstitialShownReply struct{}
 
-// InterstitialHiddenClient receives InterstitialHidden events.
+// InterstitialHiddenClient is a client for InterstitialHidden events. Fired when interstitial page was hidden
 type InterstitialHiddenClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -131,10 +131,10 @@ type InterstitialHiddenClient interface {
 	rpcc.Stream
 }
 
-// InterstitialHiddenReply fired when interstitial page was hidden
+// InterstitialHiddenReply is the reply for InterstitialHidden events.
 type InterstitialHiddenReply struct{}
 
-// NavigationRequestedClient receives NavigationRequested events.
+// NavigationRequestedClient is a client for NavigationRequested events. Fired when a navigation is started if navigation throttles are enabled.  The navigation will be deferred until processNavigation is called.
 type NavigationRequestedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -142,7 +142,7 @@ type NavigationRequestedClient interface {
 	rpcc.Stream
 }
 
-// NavigationRequestedReply fired when a navigation is started if navigation throttles are enabled.  The navigation will be deferred until processNavigation is called.
+// NavigationRequestedReply is the reply for NavigationRequested events.
 type NavigationRequestedReply struct {
 	IsInMainFrame bool   `json:"isInMainFrame"` // Whether the navigation is taking place in the main frame or in a subframe.
 	IsRedirect    bool   `json:"isRedirect"`    // Whether the navigation has encountered a server redirect or not.

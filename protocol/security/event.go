@@ -6,7 +6,7 @@ import (
 	"github.com/mafredri/cdp/rpcc"
 )
 
-// StateChangedClient receives SecurityStateChanged events.
+// StateChangedClient is a client for SecurityStateChanged events. The security state of the page changed.
 type StateChangedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -14,7 +14,7 @@ type StateChangedClient interface {
 	rpcc.Stream
 }
 
-// StateChangedReply the security state of the page changed.
+// StateChangedReply is the reply for SecurityStateChanged events.
 type StateChangedReply struct {
 	SecurityState         State                 `json:"securityState"`         // Security state.
 	SchemeIsCryptographic bool                  `json:"schemeIsCryptographic"` // True if the page was loaded over cryptographic transport such as HTTPS.
@@ -23,7 +23,7 @@ type StateChangedReply struct {
 	Summary               *string               `json:"summary,omitempty"`     // Overrides user-visible description of the state.
 }
 
-// CertificateErrorClient receives CertificateError events.
+// CertificateErrorClient is a client for CertificateError events. There is a certificate error. If overriding certificate errors is enabled, then it should be handled with the handleCertificateError command. Note: this event does not fire if the certificate error has been allowed internally.
 type CertificateErrorClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
@@ -31,7 +31,7 @@ type CertificateErrorClient interface {
 	rpcc.Stream
 }
 
-// CertificateErrorReply there is a certificate error. If overriding certificate errors is enabled, then it should be handled with the handleCertificateError command. Note: this event does not fire if the certificate error has been allowed internally.
+// CertificateErrorReply is the reply for CertificateError events.
 type CertificateErrorReply struct {
 	EventID    int    `json:"eventId"`    // The ID of the event.
 	ErrorType  string `json:"errorType"`  // The type of the error.
