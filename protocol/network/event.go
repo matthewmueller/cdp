@@ -18,7 +18,7 @@ type ResourceChangedPriorityClient interface {
 type ResourceChangedPriorityReply struct {
 	RequestID   RequestID        `json:"requestId"`   // Request identifier.
 	NewPriority ResourcePriority `json:"newPriority"` // New priority
-	Timestamp   Timestamp        `json:"timestamp"`   // Timestamp.
+	Timestamp   MonotonicTime    `json:"timestamp"`   // Timestamp.
 }
 
 // RequestWillBeSentClient receives RequestWillBeSent events.
@@ -44,10 +44,10 @@ type ResponseReceivedClient interface {
 
 // DataReceivedReply fired when data chunk was received over the network.
 type DataReceivedReply struct {
-	RequestID         RequestID `json:"requestId"`         // Request identifier.
-	Timestamp         Timestamp `json:"timestamp"`         // Timestamp.
-	DataLength        int       `json:"dataLength"`        // Data chunk length.
-	EncodedDataLength int       `json:"encodedDataLength"` // Actual bytes received (might be less than dataLength for compressed encodings).
+	RequestID         RequestID     `json:"requestId"`         // Request identifier.
+	Timestamp         MonotonicTime `json:"timestamp"`         // Timestamp.
+	DataLength        int           `json:"dataLength"`        // Data chunk length.
+	EncodedDataLength int           `json:"encodedDataLength"` // Actual bytes received (might be less than dataLength for compressed encodings).
 }
 
 // LoadingFinishedClient receives LoadingFinished events.
@@ -60,9 +60,9 @@ type LoadingFinishedClient interface {
 
 // LoadingFinishedReply fired when HTTP request has finished loading.
 type LoadingFinishedReply struct {
-	RequestID         RequestID `json:"requestId"`         // Request identifier.
-	Timestamp         Timestamp `json:"timestamp"`         // Timestamp.
-	EncodedDataLength float64   `json:"encodedDataLength"` // Total number of bytes received for this request.
+	RequestID         RequestID     `json:"requestId"`         // Request identifier.
+	Timestamp         MonotonicTime `json:"timestamp"`         // Timestamp.
+	EncodedDataLength float64       `json:"encodedDataLength"` // Total number of bytes received for this request.
 }
 
 // LoadingFailedClient receives LoadingFailed events.
@@ -76,8 +76,8 @@ type LoadingFailedClient interface {
 // WebSocketWillSendHandshakeRequestReply fired when WebSocket is about to initiate handshake.
 type WebSocketWillSendHandshakeRequestReply struct {
 	RequestID RequestID        `json:"requestId"` // Request identifier.
-	Timestamp Timestamp        `json:"timestamp"` // Timestamp.
-	WallTime  Timestamp        `json:"wallTime"`  // UTC Timestamp.
+	Timestamp MonotonicTime    `json:"timestamp"` // Timestamp.
+	WallTime  TimeSinceEpoch   `json:"wallTime"`  // UTC Timestamp.
 	Request   WebSocketRequest `json:"request"`   // WebSocket request data.
 }
 
@@ -92,7 +92,7 @@ type WebSocketHandshakeResponseReceivedClient interface {
 // WebSocketHandshakeResponseReceivedReply fired when WebSocket handshake response becomes available.
 type WebSocketHandshakeResponseReceivedReply struct {
 	RequestID RequestID         `json:"requestId"` // Request identifier.
-	Timestamp Timestamp         `json:"timestamp"` // Timestamp.
+	Timestamp MonotonicTime     `json:"timestamp"` // Timestamp.
 	Response  WebSocketResponse `json:"response"`  // WebSocket response data.
 }
 
@@ -121,8 +121,8 @@ type WebSocketClosedClient interface {
 
 // WebSocketClosedReply fired when WebSocket is closed.
 type WebSocketClosedReply struct {
-	RequestID RequestID `json:"requestId"` // Request identifier.
-	Timestamp Timestamp `json:"timestamp"` // Timestamp.
+	RequestID RequestID     `json:"requestId"` // Request identifier.
+	Timestamp MonotonicTime `json:"timestamp"` // Timestamp.
 }
 
 // WebSocketFrameReceivedClient receives WebSocketFrameReceived events.
@@ -136,7 +136,7 @@ type WebSocketFrameReceivedClient interface {
 // WebSocketFrameReceivedReply fired when WebSocket frame is received.
 type WebSocketFrameReceivedReply struct {
 	RequestID RequestID      `json:"requestId"` // Request identifier.
-	Timestamp Timestamp      `json:"timestamp"` // Timestamp.
+	Timestamp MonotonicTime  `json:"timestamp"` // Timestamp.
 	Response  WebSocketFrame `json:"response"`  // WebSocket response data.
 }
 
@@ -150,9 +150,9 @@ type WebSocketFrameErrorClient interface {
 
 // WebSocketFrameErrorReply fired when WebSocket frame error occurs.
 type WebSocketFrameErrorReply struct {
-	RequestID    RequestID `json:"requestId"`    // Request identifier.
-	Timestamp    Timestamp `json:"timestamp"`    // Timestamp.
-	ErrorMessage string    `json:"errorMessage"` // WebSocket frame error message.
+	RequestID    RequestID     `json:"requestId"`    // Request identifier.
+	Timestamp    MonotonicTime `json:"timestamp"`    // Timestamp.
+	ErrorMessage string        `json:"errorMessage"` // WebSocket frame error message.
 }
 
 // WebSocketFrameSentClient receives WebSocketFrameSent events.
@@ -166,7 +166,7 @@ type WebSocketFrameSentClient interface {
 // WebSocketFrameSentReply fired when WebSocket frame is sent.
 type WebSocketFrameSentReply struct {
 	RequestID RequestID      `json:"requestId"` // Request identifier.
-	Timestamp Timestamp      `json:"timestamp"` // Timestamp.
+	Timestamp MonotonicTime  `json:"timestamp"` // Timestamp.
 	Response  WebSocketFrame `json:"response"`  // WebSocket response data.
 }
 
@@ -180,11 +180,11 @@ type EventSourceMessageReceivedClient interface {
 
 // EventSourceMessageReceivedReply fired when EventSource message is received.
 type EventSourceMessageReceivedReply struct {
-	RequestID RequestID `json:"requestId"` // Request identifier.
-	Timestamp Timestamp `json:"timestamp"` // Timestamp.
-	EventName string    `json:"eventName"` // Message type.
-	EventID   string    `json:"eventId"`   // Message identifier.
-	Data      string    `json:"data"`      // Message content.
+	RequestID RequestID     `json:"requestId"` // Request identifier.
+	Timestamp MonotonicTime `json:"timestamp"` // Timestamp.
+	EventName string        `json:"eventName"` // Message type.
+	EventID   string        `json:"eventId"`   // Message identifier.
+	Data      string        `json:"data"`      // Message content.
 }
 
 // RequestInterceptedClient receives RequestIntercepted events.

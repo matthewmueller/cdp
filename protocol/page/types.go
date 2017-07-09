@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/mafredri/cdp/protocol"
+	"github.com/mafredri/cdp/protocol/network"
 )
 
 // FrameResourceTree Information about the Frame hierarchy along with their cached resources.
@@ -134,13 +134,13 @@ type NavigationEntry struct {
 
 // ScreencastFrameMetadata Screencast frame metadata.
 type ScreencastFrameMetadata struct {
-	OffsetTop       float64            `json:"offsetTop"`           // Top offset in DIP.
-	PageScaleFactor float64            `json:"pageScaleFactor"`     // Page scale factor.
-	DeviceWidth     float64            `json:"deviceWidth"`         // Device screen width in DIP.
-	DeviceHeight    float64            `json:"deviceHeight"`        // Device screen height in DIP.
-	ScrollOffsetX   float64            `json:"scrollOffsetX"`       // Position of horizontal scroll in CSS pixels.
-	ScrollOffsetY   float64            `json:"scrollOffsetY"`       // Position of vertical scroll in CSS pixels.
-	Timestamp       protocol.Timestamp `json:"timestamp,omitempty"` // Frame swap timestamp.
+	OffsetTop       float64                `json:"offsetTop"`           // Top offset in DIP.
+	PageScaleFactor float64                `json:"pageScaleFactor"`     // Page scale factor.
+	DeviceWidth     float64                `json:"deviceWidth"`         // Device screen width in DIP.
+	DeviceHeight    float64                `json:"deviceHeight"`        // Device screen height in DIP.
+	ScrollOffsetX   float64                `json:"scrollOffsetX"`       // Position of horizontal scroll in CSS pixels.
+	ScrollOffsetY   float64                `json:"scrollOffsetY"`       // Position of vertical scroll in CSS pixels.
+	Timestamp       network.TimeSinceEpoch `json:"timestamp,omitempty"` // Frame swap timestamp.
 }
 
 // DialogType Javascript dialog type.

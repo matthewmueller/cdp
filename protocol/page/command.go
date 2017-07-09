@@ -39,6 +39,35 @@ func NewRemoveScriptToEvaluateOnLoadArgs(identifier ScriptIdentifier) *RemoveScr
 	return args
 }
 
+// AddScriptToEvaluateOnNewDocumentArgs represents the arguments for AddScriptToEvaluateOnNewDocument in the Page domain.
+type AddScriptToEvaluateOnNewDocumentArgs struct {
+	Source string `json:"source"` //
+}
+
+// NewAddScriptToEvaluateOnNewDocumentArgs initializes AddScriptToEvaluateOnNewDocumentArgs with the required arguments.
+func NewAddScriptToEvaluateOnNewDocumentArgs(source string) *AddScriptToEvaluateOnNewDocumentArgs {
+	args := new(AddScriptToEvaluateOnNewDocumentArgs)
+	args.Source = source
+	return args
+}
+
+// AddScriptToEvaluateOnNewDocumentReply represents the return values for AddScriptToEvaluateOnNewDocument in the Page domain.
+type AddScriptToEvaluateOnNewDocumentReply struct {
+	Identifier ScriptIdentifier `json:"identifier"` // Identifier of the added script.
+}
+
+// RemoveScriptToEvaluateOnNewDocumentArgs represents the arguments for RemoveScriptToEvaluateOnNewDocument in the Page domain.
+type RemoveScriptToEvaluateOnNewDocumentArgs struct {
+	Identifier ScriptIdentifier `json:"identifier"` //
+}
+
+// NewRemoveScriptToEvaluateOnNewDocumentArgs initializes RemoveScriptToEvaluateOnNewDocumentArgs with the required arguments.
+func NewRemoveScriptToEvaluateOnNewDocumentArgs(identifier ScriptIdentifier) *RemoveScriptToEvaluateOnNewDocumentArgs {
+	args := new(RemoveScriptToEvaluateOnNewDocumentArgs)
+	args.Identifier = identifier
+	return args
+}
+
 // SetAutoAttachToCreatedPagesArgs represents the arguments for SetAutoAttachToCreatedPages in the Page domain.
 type SetAutoAttachToCreatedPagesArgs struct {
 	AutoAttach bool `json:"autoAttach"` // If true, browser will open a new inspector window for every page created from this one.

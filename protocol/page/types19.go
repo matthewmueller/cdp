@@ -21,11 +21,11 @@ type Frame struct {
 
 // FrameResource Information about the Resource on the page.
 type FrameResource struct {
-	URL          string             `json:"url"`                    // Resource URL.
-	Type         ResourceType       `json:"type"`                   // Type of this resource.
-	MimeType     string             `json:"mimeType"`               // Resource mimeType as determined by the browser.
-	LastModified *network.Timestamp `json:"lastModified,omitempty"` // last-modified timestamp as reported by server.
-	ContentSize  *float64           `json:"contentSize,omitempty"`  // Resource content size.
-	Failed       *bool              `json:"failed,omitempty"`       // True if the resource failed to load.
-	Canceled     *bool              `json:"canceled,omitempty"`     // True if the resource was canceled during loading.
+	URL          string                 `json:"url"`                    // Resource URL.
+	Type         ResourceType           `json:"type"`                   // Type of this resource.
+	MimeType     string                 `json:"mimeType"`               // Resource mimeType as determined by the browser.
+	LastModified network.TimeSinceEpoch `json:"lastModified,omitempty"` // last-modified timestamp as reported by server.
+	ContentSize  *float64               `json:"contentSize,omitempty"`  // Resource content size.
+	Failed       *bool                  `json:"failed,omitempty"`       // True if the resource failed to load.
+	Canceled     *bool                  `json:"canceled,omitempty"`     // True if the resource was canceled during loading.
 }

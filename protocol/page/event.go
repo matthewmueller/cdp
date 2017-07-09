@@ -3,7 +3,7 @@
 package page
 
 import (
-	"github.com/mafredri/cdp/protocol"
+	"github.com/mafredri/cdp/protocol/network"
 	"github.com/mafredri/cdp/rpcc"
 )
 
@@ -17,7 +17,7 @@ type DOMContentEventFiredClient interface {
 
 // DOMContentEventFiredReply
 type DOMContentEventFiredReply struct {
-	Timestamp protocol.Timestamp `json:"timestamp"` //
+	Timestamp network.MonotonicTime `json:"timestamp"` //
 }
 
 // LoadEventFiredClient receives LoadEventFired events.
@@ -30,7 +30,7 @@ type LoadEventFiredClient interface {
 
 // LoadEventFiredReply
 type LoadEventFiredReply struct {
-	Timestamp protocol.Timestamp `json:"timestamp"` //
+	Timestamp network.MonotonicTime `json:"timestamp"` //
 }
 
 // FrameAttachedClient receives FrameAttached events.

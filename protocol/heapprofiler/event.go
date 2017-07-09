@@ -3,7 +3,6 @@
 package heapprofiler
 
 import (
-	"github.com/mafredri/cdp/protocol"
 	"github.com/mafredri/cdp/rpcc"
 )
 
@@ -56,8 +55,8 @@ type LastSeenObjectIDClient interface {
 
 // LastSeenObjectIDReply if heap objects tracking has been started then backend regularly sends a current value for last seen object id and corresponding timestamp. If the were changes in the heap since last event then one or more heapStatsUpdate events will be sent before a new lastSeenObjectId event.
 type LastSeenObjectIDReply struct {
-	LastSeenObjectID int                `json:"lastSeenObjectId"` //
-	Timestamp        protocol.Timestamp `json:"timestamp"`        //
+	LastSeenObjectID int     `json:"lastSeenObjectId"` //
+	Timestamp        float64 `json:"timestamp"`        //
 }
 
 // HeapStatsUpdateClient receives HeapStatsUpdate events.

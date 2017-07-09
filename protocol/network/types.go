@@ -124,16 +124,16 @@ func (e *ErrorReason) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Timestamp Number of seconds since epoch.
-type Timestamp float64
+// TimeSinceEpoch UTC time in seconds, counted from January 1, 1970.
+type TimeSinceEpoch float64
 
 // String calls (time.Time).String().
-func (t Timestamp) String() string {
+func (t TimeSinceEpoch) String() string {
 	return t.Time().String()
 }
 
 // Time parses the Unix time with millisecond accuracy.
-func (t Timestamp) Time() time.Time {
+func (t TimeSinceEpoch) Time() time.Time {
 	secs := int64(t)
 	// The Unix time in t only has ms accuracy.
 	ms := int64((float64(t) - float64(secs)) * 1000000)
@@ -141,7 +141,7 @@ func (t Timestamp) Time() time.Time {
 }
 
 // MarshalJSON implements json.Marshaler. Encodes to null if t is zero.
-func (t Timestamp) MarshalJSON() ([]byte, error) {
+func (t TimeSinceEpoch) MarshalJSON() ([]byte, error) {
 	if t == 0 {
 		return []byte("null"), nil
 	}
@@ -150,21 +150,63 @@ func (t Timestamp) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (t *Timestamp) UnmarshalJSON(data []byte) error {
+func (t *TimeSinceEpoch) UnmarshalJSON(data []byte) error {
 	*t = 0
 	if len(data) == 0 {
 		return nil
 	}
 	var f float64
 	if err := json.Unmarshal(data, &f); err != nil {
-		return errors.New("network.Timestamp: " + err.Error())
+		return errors.New("network.TimeSinceEpoch: " + err.Error())
 	}
-	*t = Timestamp(f)
+	*t = TimeSinceEpoch(f)
 	return nil
 }
 
-var _ json.Marshaler = (*Timestamp)(nil)
-var _ json.Unmarshaler = (*Timestamp)(nil)
+var _ json.Marshaler = (*TimeSinceEpoch)(nil)
+var _ json.Unmarshaler = (*TimeSinceEpoch)(nil)
+
+// MonotonicTime Monotonically increasing time in seconds since an arbitrary point in the past.
+type MonotonicTime float64
+
+// String calls (time.Time).String().
+func (t MonotonicTime) String() string {
+	return t.Time().String()
+}
+
+// Time parses the Unix time with millisecond accuracy.
+func (t MonotonicTime) Time() time.Time {
+	secs := int64(t)
+	// The Unix time in t only has ms accuracy.
+	ms := int64((float64(t) - float64(secs)) * 1000000)
+	return time.Unix(secs, ms*1000)
+}
+
+// MarshalJSON implements json.Marshaler. Encodes to null if t is zero.
+func (t MonotonicTime) MarshalJSON() ([]byte, error) {
+	if t == 0 {
+		return []byte("null"), nil
+	}
+	f := float64(t)
+	return json.Marshal(&f)
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (t *MonotonicTime) UnmarshalJSON(data []byte) error {
+	*t = 0
+	if len(data) == 0 {
+		return nil
+	}
+	var f float64
+	if err := json.Unmarshal(data, &f); err != nil {
+		return errors.New("network.MonotonicTime: " + err.Error())
+	}
+	*t = MonotonicTime(f)
+	return nil
+}
+
+var _ json.Marshaler = (*MonotonicTime)(nil)
+var _ json.Unmarshaler = (*MonotonicTime)(nil)
 
 // Headers Request / response headers as keys / values of JSON object.
 type Headers []byte
@@ -420,26 +462,26 @@ func (e *ResourcePriority) UnmarshalJSON(data []byte) error {
 
 // Request HTTP request data.
 type Request struct {
-	URL              string           `json:"url"`                        // Request URL.
-	Method           string           `json:"method"`                     // HTTP request method.
-	Headers          Headers          `json:"headers"`                    // HTTP request headers.
-	PostData         *string          `json:"postData,omitempty"`         // HTTP POST request data.
-	MixedContentType *string          `json:"mixedContentType,omitempty"` // The mixed content status of the request, as defined in http://www.w3.org/TR/mixed-content/
-	InitialPriority  ResourcePriority `json:"initialPriority"`            // Priority of the resource request at the time request is sent.
-	ReferrerPolicy   string           `json:"referrerPolicy"`             // The referrer policy of the request, as defined in https://www.w3.org/TR/referrer-policy/
-	IsLinkPreload    *bool            `json:"isLinkPreload,omitempty"`    // Whether is loaded via link preload.
+	URL              string                     `json:"url"`                        // Request URL.
+	Method           string                     `json:"method"`                     // HTTP request method.
+	Headers          Headers                    `json:"headers"`                    // HTTP request headers.
+	PostData         *string                    `json:"postData,omitempty"`         // HTTP POST request data.
+	MixedContentType *security.MixedContentType `json:"mixedContentType,omitempty"` // The mixed content type of the request.
+	InitialPriority  ResourcePriority           `json:"initialPriority"`            // Priority of the resource request at the time request is sent.
+	ReferrerPolicy   string                     `json:"referrerPolicy"`             // The referrer policy of the request, as defined in https://www.w3.org/TR/referrer-policy/
+	IsLinkPreload    *bool                      `json:"isLinkPreload,omitempty"`    // Whether is loaded via link preload.
 }
 
 // SignedCertificateTimestamp Details of a signed certificate timestamp (SCT).
 type SignedCertificateTimestamp struct {
-	Status             string    `json:"status"`             // Validation status.
-	Origin             string    `json:"origin"`             // Origin.
-	LogDescription     string    `json:"logDescription"`     // Log name / description.
-	LogID              string    `json:"logId"`              // Log ID.
-	Timestamp          Timestamp `json:"timestamp"`          // Issuance date.
-	HashAlgorithm      string    `json:"hashAlgorithm"`      // Hash algorithm.
-	SignatureAlgorithm string    `json:"signatureAlgorithm"` // Signature algorithm.
-	SignatureData      string    `json:"signatureData"`      // Signature data.
+	Status             string         `json:"status"`             // Validation status.
+	Origin             string         `json:"origin"`             // Origin.
+	LogDescription     string         `json:"logDescription"`     // Log name / description.
+	LogID              string         `json:"logId"`              // Log ID.
+	Timestamp          TimeSinceEpoch `json:"timestamp"`          // Issuance date.
+	HashAlgorithm      string         `json:"hashAlgorithm"`      // Hash algorithm.
+	SignatureAlgorithm string         `json:"signatureAlgorithm"` // Signature algorithm.
+	SignatureData      string         `json:"signatureData"`      // Signature data.
 }
 
 // SecurityDetails Security details about a request.
@@ -453,8 +495,8 @@ type SecurityDetails struct {
 	SubjectName                    string                       `json:"subjectName"`                    // Certificate subject name.
 	SanList                        []string                     `json:"sanList"`                        // Subject Alternative Name (SAN) DNS names and IP addresses.
 	Issuer                         string                       `json:"issuer"`                         // Name of the issuing CA.
-	ValidFrom                      Timestamp                    `json:"validFrom"`                      // Certificate valid from date.
-	ValidTo                        Timestamp                    `json:"validTo"`                        // Certificate valid to (expiration) date
+	ValidFrom                      TimeSinceEpoch               `json:"validFrom"`                      // Certificate valid from date.
+	ValidTo                        TimeSinceEpoch               `json:"validTo"`                        // Certificate valid to (expiration) date
 	SignedCertificateTimestampList []SignedCertificateTimestamp `json:"signedCertificateTimestampList"` // List of signed certificate timestamps (SCTs).
 }
 

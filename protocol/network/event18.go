@@ -12,15 +12,15 @@ import (
 // RequestWillBeSentReply fired when page is about to send HTTP request.
 type RequestWillBeSentReply struct {
 	RequestID        RequestID                  `json:"requestId"`                  // Request identifier.
-	FrameID          protocol.PageFrameID       `json:"frameId"`                    // Frame identifier.
-	LoaderID         LoaderID                   `json:"loaderId"`                   // Loader identifier.
+	LoaderID         LoaderID                   `json:"loaderId"`                   // Loader identifier. Empty string if the request is fetched form worker.
 	DocumentURL      string                     `json:"documentURL"`                // URL of the document this request is loaded for.
 	Request          Request                    `json:"request"`                    // Request data.
-	Timestamp        Timestamp                  `json:"timestamp"`                  // Timestamp.
-	WallTime         Timestamp                  `json:"wallTime"`                   // UTC Timestamp.
+	Timestamp        MonotonicTime              `json:"timestamp"`                  // Timestamp.
+	WallTime         TimeSinceEpoch             `json:"wallTime"`                   // Timestamp.
 	Initiator        Initiator                  `json:"initiator"`                  // Request initiator.
 	RedirectResponse *Response                  `json:"redirectResponse,omitempty"` // Redirect response data.
 	Type             *protocol.PageResourceType `json:"type,omitempty"`             // Type of this resource.
+	FrameID          *protocol.PageFrameID      `json:"frameId,omitempty"`          // Frame identifier.
 }
 
 // RequestServedFromCacheClient receives RequestServedFromCache events.
@@ -33,12 +33,12 @@ type RequestServedFromCacheClient interface {
 
 // ResponseReceivedReply fired when HTTP response is available.
 type ResponseReceivedReply struct {
-	RequestID RequestID                 `json:"requestId"` // Request identifier.
-	FrameID   protocol.PageFrameID      `json:"frameId"`   // Frame identifier.
-	LoaderID  LoaderID                  `json:"loaderId"`  // Loader identifier.
-	Timestamp Timestamp                 `json:"timestamp"` // Timestamp.
-	Type      protocol.PageResourceType `json:"type"`      // Resource type.
-	Response  Response                  `json:"response"`  // Response data.
+	RequestID RequestID                 `json:"requestId"`         // Request identifier.
+	LoaderID  LoaderID                  `json:"loaderId"`          // Loader identifier. Empty string if the request is fetched form worker.
+	Timestamp MonotonicTime             `json:"timestamp"`         // Timestamp.
+	Type      protocol.PageResourceType `json:"type"`              // Resource type.
+	Response  Response                  `json:"response"`          // Response data.
+	FrameID   *protocol.PageFrameID     `json:"frameId,omitempty"` // Frame identifier.
 }
 
 // DataReceivedClient receives DataReceived events.
@@ -52,7 +52,7 @@ type DataReceivedClient interface {
 // LoadingFailedReply fired when HTTP request has failed to load.
 type LoadingFailedReply struct {
 	RequestID     RequestID                 `json:"requestId"`               // Request identifier.
-	Timestamp     Timestamp                 `json:"timestamp"`               // Timestamp.
+	Timestamp     MonotonicTime             `json:"timestamp"`               // Timestamp.
 	Type          protocol.PageResourceType `json:"type"`                    // Resource type.
 	ErrorText     string                    `json:"errorText"`               // User friendly error message.
 	Canceled      *bool                     `json:"canceled,omitempty"`      // True if loading was canceled.

@@ -155,7 +155,7 @@ type SetCookieArgs struct {
 	Secure         *bool          `json:"secure,omitempty"`         // Defaults ot false.
 	HTTPOnly       *bool          `json:"httpOnly,omitempty"`       // Defaults to false.
 	SameSite       CookieSameSite `json:"sameSite,omitempty"`       // Defaults to browser default behavior.
-	ExpirationDate Timestamp      `json:"expirationDate,omitempty"` // If omitted, the cookie becomes a session cookie.
+	ExpirationDate TimeSinceEpoch `json:"expirationDate,omitempty"` // If omitted, the cookie becomes a session cookie.
 }
 
 // NewSetCookieArgs initializes SetCookieArgs with the required arguments.
@@ -198,7 +198,7 @@ func (a *SetCookieArgs) SetSameSite(sameSite CookieSameSite) *SetCookieArgs {
 }
 
 // SetExpirationDate sets the ExpirationDate optional argument. If omitted, the cookie becomes a session cookie.
-func (a *SetCookieArgs) SetExpirationDate(expirationDate Timestamp) *SetCookieArgs {
+func (a *SetCookieArgs) SetExpirationDate(expirationDate TimeSinceEpoch) *SetCookieArgs {
 	a.ExpirationDate = expirationDate
 	return a
 }
@@ -293,14 +293,14 @@ type GetCertificateReply struct {
 	TableNames []string `json:"tableNames"` //
 }
 
-// EnableRequestInterceptionArgs represents the arguments for EnableRequestInterception in the Network domain.
-type EnableRequestInterceptionArgs struct {
+// SetRequestInterceptionEnabledArgs represents the arguments for SetRequestInterceptionEnabled in the Network domain.
+type SetRequestInterceptionEnabledArgs struct {
 	Enabled bool `json:"enabled"` // Whether or not HTTP requests should be intercepted and Network.requestIntercepted events sent.
 }
 
-// NewEnableRequestInterceptionArgs initializes EnableRequestInterceptionArgs with the required arguments.
-func NewEnableRequestInterceptionArgs(enabled bool) *EnableRequestInterceptionArgs {
-	args := new(EnableRequestInterceptionArgs)
+// NewSetRequestInterceptionEnabledArgs initializes SetRequestInterceptionEnabledArgs with the required arguments.
+func NewSetRequestInterceptionEnabledArgs(enabled bool) *SetRequestInterceptionEnabledArgs {
+	args := new(SetRequestInterceptionEnabledArgs)
 	args.Enabled = enabled
 	return args
 }

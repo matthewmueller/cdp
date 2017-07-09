@@ -1426,10 +1426,10 @@ type Network interface {
 	// Returns the DER-encoded certificate.
 	GetCertificate(context.Context, *network.GetCertificateArgs) (*network.GetCertificateReply, error)
 
-	// Command EnableRequestInterception
+	// Command SetRequestInterceptionEnabled
 	//
 	//
-	EnableRequestInterception(context.Context, *network.EnableRequestInterceptionArgs) error
+	SetRequestInterceptionEnabled(context.Context, *network.SetRequestInterceptionEnabledArgs) error
 
 	// Command ContinueInterceptedRequest
 	//
@@ -1624,13 +1624,23 @@ type Page interface {
 
 	// Command AddScriptToEvaluateOnLoad
 	//
-	//
+	// Deprecated, please use addScriptToEvaluateOnNewDocument instead.
 	AddScriptToEvaluateOnLoad(context.Context, *page.AddScriptToEvaluateOnLoadArgs) (*page.AddScriptToEvaluateOnLoadReply, error)
 
 	// Command RemoveScriptToEvaluateOnLoad
 	//
-	//
+	// Deprecated, please use removeScriptToEvaluateOnNewDocument instead.
 	RemoveScriptToEvaluateOnLoad(context.Context, *page.RemoveScriptToEvaluateOnLoadArgs) error
+
+	// Command AddScriptToEvaluateOnNewDocument
+	//
+	// Evaluates given script in every frame upon creation (before loading frame's scripts).
+	AddScriptToEvaluateOnNewDocument(context.Context, *page.AddScriptToEvaluateOnNewDocumentArgs) (*page.AddScriptToEvaluateOnNewDocumentReply, error)
+
+	// Command RemoveScriptToEvaluateOnNewDocument
+	//
+	// Removes given script from the list.
+	RemoveScriptToEvaluateOnNewDocument(context.Context, *page.RemoveScriptToEvaluateOnNewDocumentArgs) error
 
 	// Command SetAutoAttachToCreatedPages
 	//
