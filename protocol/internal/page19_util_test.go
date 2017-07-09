@@ -1,4 +1,6 @@
-package page
+// +build go1.9
+
+package internal
 
 import (
 	"encoding/json"
@@ -6,7 +8,7 @@ import (
 )
 
 func TestFrameID_UnmarshalJSON(t *testing.T) {
-	var id FrameID
+	var id PageFrameID
 
 	// Unmarshals string.
 	err := json.Unmarshal([]byte(`"1000.1"`), &id)

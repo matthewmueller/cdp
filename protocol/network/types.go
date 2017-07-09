@@ -576,14 +576,6 @@ type WebSocketFrame struct {
 	PayloadData string  `json:"payloadData"` // WebSocke frame payload data.
 }
 
-// CachedResource Information about the cached resource.
-type CachedResource struct {
-	URL      string    `json:"url"`                // Resource URL. This is the url of the original network request.
-	Type     string    `json:"type"`               // Type of this resource.
-	Response *Response `json:"response,omitempty"` // Cached response data.
-	BodySize float64   `json:"bodySize"`           // Cached response body size.
-}
-
 // Initiator Information about the request initiator.
 type Initiator struct {
 	Type       string              `json:"type"`                 // Type of this initiator.

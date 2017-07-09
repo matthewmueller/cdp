@@ -4,7 +4,6 @@ package page
 
 import (
 	"github.com/mafredri/cdp/protocol"
-	"github.com/mafredri/cdp/protocol/runtime"
 	"github.com/mafredri/cdp/rpcc"
 )
 
@@ -42,21 +41,6 @@ type FrameAttachedClient interface {
 	rpcc.Stream
 }
 
-// FrameAttachedReply fired when frame has been attached to its parent.
-type FrameAttachedReply struct {
-	FrameID       FrameID             `json:"frameId"`         // Id of the frame that has been attached.
-	ParentFrameID FrameID             `json:"parentFrameId"`   // Parent frame identifier.
-	Stack         *runtime.StackTrace `json:"stack,omitempty"` // JavaScript stack trace of when frame was attached, only set if frame initiated from script.
-}
-
-// FrameNavigatedClient receives FrameNavigated events.
-type FrameNavigatedClient interface {
-	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
-	// triggered, context canceled or connection closed.
-	Recv() (*FrameNavigatedReply, error)
-	rpcc.Stream
-}
-
 // FrameNavigatedReply fired once navigation of the frame has completed. Frame is now associated with the new loader.
 type FrameNavigatedReply struct {
 	Frame Frame `json:"frame"` // Frame object.
@@ -67,72 +51,6 @@ type FrameDetachedClient interface {
 	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
 	// triggered, context canceled or connection closed.
 	Recv() (*FrameDetachedReply, error)
-	rpcc.Stream
-}
-
-// FrameDetachedReply fired when frame has been detached from its parent.
-type FrameDetachedReply struct {
-	FrameID FrameID `json:"frameId"` // Id of the frame that has been detached.
-}
-
-// FrameStartedLoadingClient receives FrameStartedLoading events.
-type FrameStartedLoadingClient interface {
-	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
-	// triggered, context canceled or connection closed.
-	Recv() (*FrameStartedLoadingReply, error)
-	rpcc.Stream
-}
-
-// FrameStartedLoadingReply fired when frame has started loading.
-type FrameStartedLoadingReply struct {
-	FrameID FrameID `json:"frameId"` // Id of the frame that has started loading.
-}
-
-// FrameStoppedLoadingClient receives FrameStoppedLoading events.
-type FrameStoppedLoadingClient interface {
-	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
-	// triggered, context canceled or connection closed.
-	Recv() (*FrameStoppedLoadingReply, error)
-	rpcc.Stream
-}
-
-// FrameStoppedLoadingReply fired when frame has stopped loading.
-type FrameStoppedLoadingReply struct {
-	FrameID FrameID `json:"frameId"` // Id of the frame that has stopped loading.
-}
-
-// FrameScheduledNavigationClient receives FrameScheduledNavigation events.
-type FrameScheduledNavigationClient interface {
-	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
-	// triggered, context canceled or connection closed.
-	Recv() (*FrameScheduledNavigationReply, error)
-	rpcc.Stream
-}
-
-// FrameScheduledNavigationReply fired when frame schedules a potential navigation.
-type FrameScheduledNavigationReply struct {
-	FrameID FrameID `json:"frameId"` // Id of the frame that has scheduled a navigation.
-	Delay   float64 `json:"delay"`   // Delay (in seconds) until the navigation is scheduled to begin. The navigation is not guaranteed to start.
-}
-
-// FrameClearedScheduledNavigationClient receives FrameClearedScheduledNavigation events.
-type FrameClearedScheduledNavigationClient interface {
-	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
-	// triggered, context canceled or connection closed.
-	Recv() (*FrameClearedScheduledNavigationReply, error)
-	rpcc.Stream
-}
-
-// FrameClearedScheduledNavigationReply fired when frame no longer has a scheduled navigation.
-type FrameClearedScheduledNavigationReply struct {
-	FrameID FrameID `json:"frameId"` // Id of the frame that has cleared its scheduled navigation.
-}
-
-// FrameResizedClient receives FrameResized events.
-type FrameResizedClient interface {
-	// Recv calls RecvMsg on rpcc.Stream, blocks until the event is
-	// triggered, context canceled or connection closed.
-	Recv() (*FrameResizedReply, error)
 	rpcc.Stream
 }
 

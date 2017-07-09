@@ -4,7 +4,6 @@ package css
 
 import (
 	"github.com/mafredri/cdp/protocol/dom"
-	"github.com/mafredri/cdp/protocol/page"
 )
 
 // GetMatchedStylesForNodeArgs represents the arguments for GetMatchedStylesForNode in the CSS domain.
@@ -212,18 +211,6 @@ func NewSetMediaTextArgs(styleSheetID StyleSheetID, rang SourceRange, text strin
 // SetMediaTextReply represents the return values for SetMediaText in the CSS domain.
 type SetMediaTextReply struct {
 	Media Media `json:"media"` // The resulting CSS media rule after modification.
-}
-
-// CreateStyleSheetArgs represents the arguments for CreateStyleSheet in the CSS domain.
-type CreateStyleSheetArgs struct {
-	FrameID page.FrameID `json:"frameId"` // Identifier of the frame where "via-inspector" stylesheet should be created.
-}
-
-// NewCreateStyleSheetArgs initializes CreateStyleSheetArgs with the required arguments.
-func NewCreateStyleSheetArgs(frameID page.FrameID) *CreateStyleSheetArgs {
-	args := new(CreateStyleSheetArgs)
-	args.FrameID = frameID
-	return args
 }
 
 // CreateStyleSheetReply represents the return values for CreateStyleSheet in the CSS domain.

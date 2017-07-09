@@ -1,4 +1,6 @@
-package page
+// +build go1.9
+
+package internal
 
 import (
 	"encoding/json"
@@ -6,7 +8,7 @@ import (
 )
 
 // UnmarshalJSON decodes the FrameID from either string or float.
-func (p *FrameID) UnmarshalJSON(data []byte) error {
+func (p *PageFrameID) UnmarshalJSON(data []byte) error {
 	var s string
 	err := json.Unmarshal(data, &s)
 	if err != nil {
@@ -19,6 +21,6 @@ func (p *FrameID) UnmarshalJSON(data []byte) error {
 		}
 		s = strconv.FormatFloat(f, 'f', -1, 64)
 	}
-	*p = FrameID(s)
+	*p = PageFrameID(s)
 	return nil
 }

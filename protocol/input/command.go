@@ -2,7 +2,9 @@
 
 package input
 
-import "github.com/mafredri/cdp/protocol"
+import (
+	"github.com/mafredri/cdp/protocol"
+)
 
 // SetIgnoreInputEventsArgs represents the arguments for SetIgnoreInputEvents in the Input domain.
 type SetIgnoreInputEventsArgs struct {
