@@ -25,12 +25,12 @@ func run() error {
 
 	devt := devtool.New("http://localhost:9222")
 
-	target, err := devt.Get(ctx, devtool.Page)
+	pageTarget, err := devt.Get(ctx, devtool.Page)
 	if err != nil {
 		return err
 	}
 
-	conn, err := rpcc.DialContext(ctx, target.WebSocketDebuggerURL)
+	conn, err := rpcc.DialContext(ctx, pageTarget.WebSocketDebuggerURL)
 	if err != nil {
 		return err
 	}

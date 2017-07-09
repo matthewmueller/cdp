@@ -19,16 +19,16 @@ func Example() {
 
 	// Use the DevTools json API to get the current page.
 	devt := devtool.New("http://127.0.0.1:9222")
-	target, err := devt.Get(ctx, devtool.Page)
+	pageTarget, err := devt.Get(ctx, devtool.Page)
 	if err != nil {
-		target, err = devt.Create(ctx)
+		pageTarget, err = devt.Create(ctx)
 		if err != nil {
 			panic(err)
 		}
 	}
 
 	// Connect to Chrome Debugging Protocol target.
-	conn, err := rpcc.DialContext(ctx, target.WebSocketDebuggerURL)
+	conn, err := rpcc.DialContext(ctx, pageTarget.WebSocketDebuggerURL)
 	if err != nil {
 		panic(err)
 	}
