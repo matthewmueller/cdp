@@ -261,10 +261,6 @@ func (at AnyType) Recvr(d Domain) string {
 }
 
 func nameInDomain(d Domain, name, sep string) string {
-	// Used _ to separate the domain name from the type, e.g. DOM_NodeID.
-	// if sep == "" {
-	// 	sep = "_"
-	// }
 	name = lint.Name(strings.Title(name))
 	if name != d.Name() && strings.Index(name, d.Name()) == 0 {
 		name = strings.Replace(name, d.Name(), "", 1)
@@ -272,28 +268,14 @@ func nameInDomain(d Domain, name, sep string) string {
 			sep = ""
 		}
 	}
-	// return d.Name() + sep + name
 	return name
 }
 
 // GoType returns the Go representation for a protocol type.
 func (at AnyType) GoType(pkg string, d Domain) string {
 	if at.Ref != "" {
-		// prefix := "cdptype."
-		// if pkg == "cdptype" {
-		// 	prefix = ""
-		// }
 		var prefix string
 		if strings.ContainsRune(at.Ref, '.') {
-			// TODO(mafredri): Handle this better, use aliases for Go 1.9.
-			if d.Name() == "Network" || d.Name() == "DOM" {
-				if at.Ref == "Page.FrameId" {
-					return "string"
-				}
-				if at.Ref == "Page.ResourceType" {
-					return "string"
-				}
-			}
 			s := strings.Split(at.Ref, ".")
 			prefix = strings.ToLower(s[0]) + "."
 			s[0] = lint.Name(strings.Title(s[0]))
@@ -310,9 +292,6 @@ func (at AnyType) GoType(pkg string, d Domain) string {
 	// Special handling for parameters names "timestamp".
 	if at.NameName == "timestamp" && at.Type == "number" {
 		prefix := "protocol."
-		// if pkg == "cdptype" {
-		// 	prefix = ""
-		// }
 		return prefix + "Timestamp"
 	}
 	// Special handling for domain types named "Timestamp".

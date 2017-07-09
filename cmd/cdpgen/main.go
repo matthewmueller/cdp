@@ -82,6 +82,8 @@ func main() {
 	protoDest := path.Join(destPkg, "protocol")
 	imports := []string{
 		"github.com/mafredri/cdp/rpcc",
+		"github.com/mafredri/cdp/protocol/internal",
+		"github.com/mafredri/cdp/protocol",
 	}
 	for i, d := range protocol.Domains {
 		dLower := strings.ToLower(d.Name())
@@ -137,6 +139,39 @@ type Timestamp `)
 	g.Printf("\n\n")
 	g.writeFile("protocol.go")
 
+	// Generate circular dependency types inside protocol package.
+	for _, d := range protocol.Domains {
+		if d.Name() == "Page" {
+			d.Domain = "protocol"
+			g.Printf("// +build !go1.9\n\n")
+			g.PackageHeader()
+			for _, t := range d.Types {
+				if t.Name(d) == "FrameID" || t.Name(d) == "ResourceType" {
+					t.IDName = "Page" + t.IDName
+					g.DomainType(d, t)
+				}
+			}
+			g.writeFile("page18.go")
+		}
+	}
+
+	g.pkg = "internal"
+	g.dir = path.Join(protoDest, "internal")
+	for _, d := range protocol.Domains {
+		if d.Name() == "Page" {
+			d.Domain = "internal"
+			g.Printf("// +build go1.9\n\n")
+			g.PackageHeader()
+			for _, t := range d.Types {
+				if t.Name(d) == "FrameID" || t.Name(d) == "ResourceType" {
+					t.IDName = "Page" + t.IDName
+					g.DomainType(d, t)
+				}
+			}
+			g.writeFile("page19.go")
+		}
+	}
+
 	for _, d := range protocol.Domains {
 		cdp.PackageHeader()
 		cdp.DomainInterface(d)
@@ -154,6 +189,10 @@ type Timestamp `)
 		if len(d.Types) > 0 {
 			g.PackageHeader()
 			for _, t := range d.Types {
+				// Use type aliases (internal.PageFrameID) instead (or protocol.PageFrameID for go18).
+				if d.Name() == "Page" && (t.Name(d) == "FrameID" || t.Name(d) == "ResourceType") {
+					continue
+				}
 				g.DomainType(d, t)
 			}
 			g.writeFile("types.go")
@@ -200,153 +239,6 @@ type Timestamp `)
 	}
 }
 
-func generateUnifiedDomains(destPkg string, protocol proto.Protocol) {
-	var cdpgen, typegen, cmdgen, eventgen, domgen Generator
-
-	cdpgen.dir = destPkg
-	cdpgen.pkg = "cdp"
-	err := mkdir(cdpgen.path())
-	panicErr(err)
-
-	typegen.pkg = "cdptype"
-	typegen.dir = path.Join(cdpgen.dir, typegen.pkg)
-	err = mkdir(typegen.path())
-	panicErr(err)
-
-	cmdgen.pkg = "cdpcmd"
-	cmdgen.dir = path.Join(cdpgen.dir, cmdgen.pkg)
-	err = mkdir(cmdgen.path())
-	panicErr(err)
-
-	eventgen.pkg = "cdpevent"
-	eventgen.dir = path.Join(cdpgen.dir, eventgen.pkg)
-	err = mkdir(eventgen.path())
-	panicErr(err)
-
-	internal := path.Join(cdpgen.dir, "internal")
-	domgen.pkg = "cdpdom"
-	domgen.dir = path.Join(internal, domgen.pkg)
-	err = mkdir(domgen.path())
-	panicErr(err)
-
-	var imports []string
-	for _, d := range protocol.Domains {
-		imports = append(imports, path.Join(cdpgen.dir, strings.ToLower(d.Name())))
-	}
-
-	cdpgen.imports = []string{
-		"github.com/mafredri/cdp/rpcc",
-		typegen.dir, cmdgen.dir, eventgen.dir, domgen.dir,
-	}
-	cdpgen.imports = append(cdpgen.imports, imports...)
-	cmdgen.imports = []string{typegen.dir}
-	cmdgen.imports = append(cmdgen.imports, imports...)
-	eventgen.imports = []string{typegen.dir}
-	eventgen.imports = append(eventgen.imports, imports...)
-	domgen.imports = []string{typegen.dir, cmdgen.dir, eventgen.dir}
-	domgen.imports = append(domgen.imports, imports...)
-
-	// Define the cdp Client.
-	cdpgen.PackageHeader()
-	cdpgen.CdpClient(protocol.Domains)
-	cdpgen.writeFile("cdp_client.go")
-
-	// Define all CDP command methods.
-	cmdgen.PackageHeader()
-	cmdgen.CmdType(protocol.Domains)
-	cmdgen.writeFile("cmd.go")
-
-	// Define all CDP event methods.
-	eventgen.PackageHeader()
-	eventgen.EventType(protocol.Domains)
-	eventgen.writeFile("event.go")
-
-	for i, d := range protocol.Domains {
-		for ii, t := range d.Types {
-			nam := t.Name(d)
-			if isNonPointer(typegen.pkg, d, t) {
-				nonPtrMap[nam] = true
-				nonPtrMap[typegen.pkg+"."+nam] = true
-			}
-
-			// Reference the FrameId in the Frame type.
-			if d.Domain == "Page" && t.IDName == "Frame" {
-				for iii, p := range t.Properties {
-					if p.NameName == "id" || p.NameName == "parentId" {
-						p.Ref = "FrameId"
-						t.Properties[iii] = p
-					}
-				}
-			}
-			d.Types[ii] = t
-		}
-		protocol.Domains[i] = d
-	}
-	nonPtrMap["Timestamp"] = true
-	nonPtrMap[typegen.pkg+"."+"Timestamp"] = true
-
-	for _, d := range protocol.Domains {
-		cdpgen.PackageHeader()
-		cdpgen.DomainInterface(d)
-
-		domgen.PackageHeader()
-		domgen.DomainDefinition(d)
-
-		if len(d.Types) > 0 {
-			typegen.PackageHeader()
-			for _, t := range d.Types {
-				typegen.DomainType(d, t)
-			}
-		}
-
-		if len(d.Commands) > 0 {
-			cmdgen.PackageHeader()
-			for _, c := range d.Commands {
-				cmdgen.DomainCmd(d, c)
-			}
-		}
-
-		if len(d.Events) > 0 {
-			eventgen.PackageHeader()
-			for _, e := range d.Events {
-				eventgen.DomainEvent(d, e)
-			}
-		}
-	}
-
-	// Add a custom Timestamp type.
-	typegen.Printf(`
-// Timestamp represents a timestamp (since epoch).
-type Timestamp `)
-	typegen.domainTypeTime(proto.Domain{}, proto.AnyType{NameName: "Timestamp", Type: "number"})
-	typegen.Printf("\n\n")
-
-	typegen.writeFile(typegen.pkg + ".go")
-	cmdgen.writeFile(cmdgen.pkg + ".go")
-	eventgen.writeFile(eventgen.pkg + ".go")
-	domgen.writeFile(domgen.pkg + ".go")
-	cdpgen.writeFile(cdpgen.pkg + ".go")
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	goimports := exec.CommandContext(ctx, "goimports", "-w", cdpgen.path(), typegen.path(), cmdgen.path(), eventgen.path())
-	out, err := goimports.CombinedOutput()
-	if err != nil {
-		log.Printf("%s", out)
-		log.Println(err)
-		os.Exit(1)
-	}
-
-	goinstall := exec.CommandContext(ctx, "go", "install", path.Join(cdpgen.path(), "..."))
-	out, err = goinstall.CombinedOutput()
-	if err != nil {
-		log.Printf("%s", out)
-		log.Println(err)
-		os.Exit(1)
-	}
-}
-
 // Generator holds the state of the analysis. Primarily used to buffer
 // the output for format.Source.
 type Generator struct {
@@ -357,6 +249,13 @@ type Generator struct {
 	testbuf    bytes.Buffer // Accumulated test output.
 	hasContent bool
 	hasHeader  bool
+
+	// For managing circular types for go 1.8/1.9.
+	writingType    bool
+	isCircularType bool
+	typebuf        bytes.Buffer // Accumulated type output.
+	typebuf18      bytes.Buffer
+	typebuf19      bytes.Buffer
 }
 
 func (g *Generator) path() string {
@@ -365,12 +264,55 @@ func (g *Generator) path() string {
 
 // Printf prints to the Generator buffer.
 func (g *Generator) Printf(format string, args ...interface{}) {
-	fmt.Fprintf(&g.buf, format, args...)
+	buf := &g.buf
+	if g.isCircularType {
+		fmt.Fprintf(&g.typebuf19, format, args...)
+		fmt.Fprintf(&g.typebuf18, format, args...)
+		return
+	}
+	if g.writingType {
+		buf = &g.typebuf
+	}
+	fmt.Fprintf(buf, format, args...)
+}
+
+func (g *Generator) Printf19(format string, args ...interface{}) {
+	fmt.Fprintf(&g.typebuf19, format, args...)
+}
+func (g *Generator) Printf18(format string, args ...interface{}) {
+	fmt.Fprintf(&g.typebuf18, format, args...)
+}
+
+func (g *Generator) beginType() {
+	g.writingType = true
+	g.isCircularType = false
+}
+func (g *Generator) markCircularType() {
+	if !g.isCircularType {
+		_, err := g.typebuf19.Write(g.typebuf.Bytes())
+		panicErr(err)
+		_, err = g.typebuf18.Write(g.typebuf.Bytes())
+		panicErr(err)
+		g.typebuf.Reset()
+	}
+	g.isCircularType = true
+
+}
+func (g *Generator) commitType() {
+	g.writingType = false
+	if g.isCircularType {
+		return
+	}
+
+	_, err := g.typebuf.WriteTo(&g.buf)
+	panicErr(err)
+	g.typebuf.Reset()
 }
 
 // TestPrintf prints to the Generator test buffer.
 func (g *Generator) TestPrintf(format string, args ...interface{}) {
-	fmt.Fprintf(&g.testbuf, format, args...)
+	// No-op
+	// fmt.Fprintf(&g.testbuf, format, args...)
 }
 
 func (g *Generator) writeFile(f string) {
@@ -385,22 +327,45 @@ func (g *Generator) writeFile(f string) {
 		return
 	}
 	log.Printf("Writing %s...", fp)
-	if err := ioutil.WriteFile(fp, g.format(), 0644); err != nil {
-		panic(err)
-	}
+	err := ioutil.WriteFile(fp, g.format(), 0644)
+	panicErr(err)
+
 	if g.testbuf.Len() > 0 {
-		g.buf.Truncate(0)
+		g.buf.Reset()
 		g.Printf("package %s\n\n", g.pkg)
-		_, err := g.testbuf.WriteTo(&g.buf)
-		if err != nil {
-			panic(err)
-		}
+		_, err = g.testbuf.WriteTo(&g.buf)
+		panicErr(err)
 		fptest := strings.Replace(fp, ".go", "_test.go", 1)
 		log.Printf("Writing %s...", fptest)
 
-		if err := ioutil.WriteFile(fptest, g.format(), 0644); err != nil {
-			panic(err)
-		}
+		err = ioutil.WriteFile(fptest, g.format(), 0644)
+		panicErr(err)
+	}
+	g.clear()
+
+	if g.typebuf19.Len() > 0 {
+		g.Printf("// +build go1.9\n\n")
+		g.hasHeader = false
+		g.PackageHeader()
+		_, err = g.typebuf19.WriteTo(&g.buf)
+		panicErr(err)
+		fp19 := strings.Replace(fp, ".go", "19.go", 1)
+		log.Printf("Writing %s...", fp19)
+		err = ioutil.WriteFile(fp19, g.format(), 0644)
+		panicErr(err)
+	}
+	g.clear()
+
+	if g.typebuf18.Len() > 0 {
+		g.Printf("// +build !go1.9\n\n")
+		g.hasHeader = false
+		g.PackageHeader()
+		_, err = g.typebuf18.WriteTo(&g.buf)
+		panicErr(err)
+		fp18 := strings.Replace(fp, ".go", "18.go", 1)
+		log.Printf("Writing %s...", fp18)
+		err = ioutil.WriteFile(fp18, g.format(), 0644)
+		panicErr(err)
 	}
 	g.clear()
 }
@@ -408,8 +373,11 @@ func (g *Generator) writeFile(f string) {
 func (g *Generator) clear() {
 	g.hasContent = false
 	g.hasHeader = false
-	g.buf.Truncate(0)
-	g.testbuf.Truncate(0)
+	g.writingType = false
+	g.isCircularType = false
+	g.buf.Reset()
+	g.testbuf.Reset()
+	g.typebuf.Reset()
 }
 
 // format returns the gofmt-ed contents of the Generator's buffer.
@@ -599,6 +567,7 @@ func Test%[1]s_%[2]s(t *testing.T) {
 		g.TestPrintf(`
 }
 `)
+
 	}
 	for _, e := range d.Events {
 		eventClient := fmt.Sprintf("%sClient", e.EventName(d))
@@ -670,10 +639,13 @@ func Test%[1]s_%[2]s(t *testing.T) {
 // DomainType creates the type definition.
 func (g *Generator) DomainType(d proto.Domain, t proto.AnyType) {
 	g.hasContent = true
+
+	g.beginType()
 	g.Printf(`
 // %[1]s %[2]s
 type %[1]s `, t.Name(d), t.Desc())
-	switch t.GoType(g.pkg, d) {
+	typ := t.GoType(g.pkg, d)
+	switch typ {
 	case "struct":
 		g.domainTypeStruct(d, t)
 	case "enum":
@@ -683,20 +655,39 @@ type %[1]s `, t.Name(d), t.Desc())
 	case "RawMessage":
 		g.domainTypeRawMessage(d, t)
 	default:
-		g.Printf(t.GoType(g.pkg, d))
+		g.Printf(typ)
 	}
 	g.Printf("\n\n")
+	g.commitType()
 }
 
 func (g *Generator) printStructProperties(d proto.Domain, name string, props []proto.AnyType, ptrOptional, renameOptional bool) {
 	for _, prop := range props {
 		jsontag := prop.NameName
 		ptype := prop.GoType(g.pkg, d)
+		ptype19 := ptype
+		ptype18 := ptype
+
+		if ptype == "page.FrameID" || ptype == "page.ResourceType" {
+			g.markCircularType()
+			if g.pkg == "network" || g.pkg == "dom" {
+				// Domain-local type (alias) for go1.9.
+				ptype19 = strings.Replace(ptype19, "page.", "", 1)
+			}
+			ptype18 = strings.Replace(ptype18, ".", "", 1)
+			ptype18 = "protocol." + strings.Title(ptype18)
+		}
+		if g.pkg == "page" && (ptype == "FrameID" || ptype == "ResourceType") {
+			g.markCircularType()
+			ptype18 = "protocol.Page" + ptype18
+		}
 		// Make all optional properties into pointers, unless they are slices.
 		if prop.Optional {
 			isNonPtr := nonPtrMap[ptype]
 			if ptrOptional && !isNonPtr && !isNonPointer(g.pkg, d, prop) {
 				ptype = "*" + ptype
+				ptype19 = "*" + ptype19
+				ptype18 = "*" + ptype18
 			}
 			jsontag += ",omitempty"
 		}
@@ -704,6 +695,8 @@ func (g *Generator) printStructProperties(d proto.Domain, name string, props []p
 		// Avoid recursive type definitions.
 		if ptype == name {
 			ptype = "*" + ptype
+			ptype19 = "*" + ptype19
+			ptype18 = "*" + ptype18
 		}
 
 		exportedName := prop.ExportedName(d)
@@ -711,7 +704,12 @@ func (g *Generator) printStructProperties(d proto.Domain, name string, props []p
 			exportedName = OptionalPropPrefix + exportedName
 		}
 
-		g.Printf("\t%s %s `json:\"%s\"` // %s\n", exportedName, ptype, jsontag, prop.Desc())
+		if !g.isCircularType {
+			g.Printf("\t%s %s `json:\"%s\"` // %s\n", exportedName, ptype, jsontag, prop.Desc())
+		} else {
+			g.Printf19("\t%s %s `json:\"%s\"` // %s\n", exportedName, ptype19, jsontag, prop.Desc())
+			g.Printf18("\t%s %s `json:\"%s\"` // %s\n", exportedName, ptype18, jsontag, prop.Desc())
+		}
 	}
 }
 
@@ -763,6 +761,7 @@ func (t *%[1]s) UnmarshalJSON(data []byte) error {
 var _ json.Marshaler = (*%[1]s)(nil)
 var _ json.Unmarshaler = (*%[1]s)(nil)
 `, t.Name(d), g.pkg)
+
 	g.TestPrintf(`
 func Test%[1]s_Marshal(t *testing.T) {
 	var v %[1]s
@@ -1015,14 +1014,18 @@ const (`)
 
 // DomainCmd defines the command args and reply.
 func (g *Generator) DomainCmd(d proto.Domain, c proto.Command) {
+	g.beginType()
 	if len(c.Parameters) > 0 {
 		g.hasContent = true
 		g.domainCmdArgs(d, c)
 	}
+	g.commitType()
+	g.beginType()
 	if len(c.Returns) > 0 {
 		g.hasContent = true
 		g.domainCmdReply(d, c)
 	}
+	g.commitType()
 }
 
 func (g *Generator) domainCmdArgs(d proto.Domain, c proto.Command) {
@@ -1032,14 +1035,27 @@ type %[1]s struct {`, c.ArgsName(d), c.Name(), d.Name())
 	g.printStructProperties(d, c.ArgsName(d), c.Parameters, true, true)
 	g.Printf("}\n\n")
 
-	g.Printf(`
+	newfmt := `
 // New%[1]s initializes %[4]s with the required arguments.
 func New%[1]s(%[2]s) *%[1]s {
 	args := new(%[1]s)
 	%[3]s
 	return args
 }
-`, c.ArgsName(d), c.ArgsSignature(d), c.ArgsAssign("args", d), c.ArgsName(d))
+`
+	if !g.isCircularType {
+		g.Printf(newfmt, c.ArgsName(d), c.ArgsSignature(d), c.ArgsAssign("args", d), c.ArgsName(d))
+	} else {
+		sig := c.ArgsSignature(d)
+		g.Printf19(newfmt, c.ArgsName(d), sig, c.ArgsAssign("args", d), c.ArgsName(d))
+		sig18 := strings.Replace(sig, "page.FrameID", "protocol.PageFrameID", 1)
+		sig18 = strings.Replace(sig18, "page.ResourceType", "protocol.PageResourceType", 1)
+		if d.Name() == "Page" {
+			sig18 = strings.Replace(sig, "FrameID", "protocol.PageFrameID", 1)
+			sig18 = strings.Replace(sig18, "ResourceType", "protocol.PageResourceType", 1)
+		}
+		g.Printf18(newfmt, c.ArgsName(d), sig18, c.ArgsAssign("args", d), c.ArgsName(d))
+	}
 
 	// Test the new arguments.
 	testInit := ""
@@ -1112,7 +1128,10 @@ const (`)
 func (g *Generator) DomainEvent(d proto.Domain, e proto.Event) {
 	g.hasContent = true
 	g.domainEventClient(d, e)
+
+	g.beginType()
 	g.domainEventReply(d, e)
+	g.commitType()
 }
 
 func (g *Generator) domainEventClient(d proto.Domain, e proto.Event) {
