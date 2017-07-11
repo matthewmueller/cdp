@@ -182,10 +182,6 @@ func main() {
 		if len(d.Types) > 0 {
 			g.PackageHeader("")
 			for _, t := range d.Types {
-				// Use type aliases (internal.PageFrameID) instead (or protocol.PageFrameID for go18).
-				if d.Name() == "Page" && (t.Name(d) == "FrameID" || t.Name(d) == "ResourceType") {
-					continue
-				}
 				g.DomainType(d, t)
 			}
 			g.writeFile("types.go")
@@ -638,9 +634,21 @@ func (g *Generator) DomainType(d proto.Domain, t proto.AnyType) {
 	g.hasContent = true
 
 	g.beginType()
+	var comment string
+	if d.Name() == "Page" && (t.Name(d) == "FrameID" || t.Name(d) == "ResourceType") {
+		g.markCircularType()
+		comment = "//"
+		g.Printf19(`
+// %[1]s %[2]s
+//
+// Provided as an alias to prevent circular dependencies.
+type %[1]s = internal.Page%[1]s
+`, t.Name(d), t.Desc())
+	}
 	g.Printf(`
 // %[1]s %[2]s
-type %[1]s `, t.Name(d), t.Desc())
+%[3]stype %[1]s `, t.Name(d), t.Desc(), comment)
+
 	typ := t.GoType(g.pkg, d)
 	switch typ {
 	case "struct":
@@ -856,22 +864,38 @@ func Test%[1]s_Marshal(t *testing.T) {
 }
 
 func (g *Generator) domainTypeEnum(d proto.Domain, t proto.AnyType) {
+	isCircular := g.isCircularType
+
 	if t.Type != "string" {
 		log.Panicf("unknown enum type: %s", t.Type)
 	}
 	if realEnum {
 		name := strings.Title(t.Name(d))
-		g.Printf(`int
+		g.Printf("int\n\n")
 
+		if name != "PageResourceType" {
+			format := `
 // %s as enums.
 const (
-	%sNotSet %s = iota`, name, name, name)
-		for _, e := range t.Enum {
-			g.Printf("\n\t%s%s", name, e.Name())
+	%sNotSet %s = iota`
+			if !isCircular {
+				g.Printf(format, name, name, name)
+			} else {
+				g.Printf19(format, name, name, name)
+				g.Printf18(format, name, name, "protocol."+d.Name()+name)
+			}
+			for _, e := range t.Enum {
+				g.Printf("\n\t%s%s", name, e.Name())
+			}
+			g.Printf(`
+)
+`)
+			if isCircular {
+				g.commitType()
+				g.beginType()
+			}
 		}
 		g.Printf(`
-)
-
 // Valid returns true if enum is set.
 func (e %[1]s) Valid() bool {
 	return e >= 1 && e <= %[2]d
@@ -986,6 +1010,9 @@ func Test%[1]s_Marshal(t *testing.T) {
 	g.TestPrintf(`
 }
 `)
+	if isCircular {
+		g.typebuf.Reset()
+	}
 }
 
 // CmdType generates the type for CDP methods names.
