@@ -57,12 +57,12 @@ func TestBrowser_RemoteDebuggingProtocol(t *testing.T) {
 	defer cancel()
 
 	devt := devtool.New(fmt.Sprintf("http://localhost:%d", *remoteDebuggingPort))
-	target, err := devt.Get(ctx, devtool.Page)
+	pt, err := devt.Get(ctx, devtool.Page)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	conn, err := rpcc.DialContext(ctx, target.WebSocketDebuggerURL)
+	conn, err := rpcc.DialContext(ctx, pt.WebSocketDebuggerURL)
 	if err != nil {
 		t.Fatal(err)
 	}
