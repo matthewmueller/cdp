@@ -9,6 +9,30 @@ import (
 	"github.com/mafredri/cdp/protocol/network"
 )
 
+// ResourceType Resource type as it was perceived by the rendering engine.
+//type ResourceType int
+
+// ResourceType as enums.
+const (
+	ResourceTypeNotSet protocol.PageResourceType = iota
+	ResourceTypeDocument
+	ResourceTypeStylesheet
+	ResourceTypeImage
+	ResourceTypeMedia
+	ResourceTypeFont
+	ResourceTypeScript
+	ResourceTypeTextTrack
+	ResourceTypeXHR
+	ResourceTypeFetch
+	ResourceTypeEventSource
+	ResourceTypeWebSocket
+	ResourceTypeManifest
+	ResourceTypeOther
+)
+
+// FrameID Unique frame identifier.
+//type FrameID string
+
 // Frame Information about the Frame on the page.
 type Frame struct {
 	ID             protocol.PageFrameID  `json:"id"`                 // Frame unique identifier.

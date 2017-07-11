@@ -13,24 +13,6 @@ import (
 // PageResourceType Resource type as it was perceived by the rendering engine.
 type PageResourceType int
 
-// PageResourceType as enums.
-const (
-	PageResourceTypeNotSet PageResourceType = iota
-	PageResourceTypeDocument
-	PageResourceTypeStylesheet
-	PageResourceTypeImage
-	PageResourceTypeMedia
-	PageResourceTypeFont
-	PageResourceTypeScript
-	PageResourceTypeTextTrack
-	PageResourceTypeXHR
-	PageResourceTypeFetch
-	PageResourceTypeEventSource
-	PageResourceTypeWebSocket
-	PageResourceTypeManifest
-	PageResourceTypeOther
-)
-
 // Valid returns true if enum is set.
 func (e PageResourceType) Valid() bool {
 	return e >= 1 && e <= 13

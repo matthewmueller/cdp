@@ -5,8 +5,43 @@
 package page
 
 import (
+	"github.com/mafredri/cdp/protocol/internal"
 	"github.com/mafredri/cdp/protocol/network"
 )
+
+// ResourceType Resource type as it was perceived by the rendering engine.
+//
+// Provided as an alias to prevent circular dependencies.
+type ResourceType = internal.PageResourceType
+
+// ResourceType Resource type as it was perceived by the rendering engine.
+//type ResourceType int
+
+// ResourceType as enums.
+const (
+	ResourceTypeNotSet ResourceType = iota
+	ResourceTypeDocument
+	ResourceTypeStylesheet
+	ResourceTypeImage
+	ResourceTypeMedia
+	ResourceTypeFont
+	ResourceTypeScript
+	ResourceTypeTextTrack
+	ResourceTypeXHR
+	ResourceTypeFetch
+	ResourceTypeEventSource
+	ResourceTypeWebSocket
+	ResourceTypeManifest
+	ResourceTypeOther
+)
+
+// FrameID Unique frame identifier.
+//
+// Provided as an alias to prevent circular dependencies.
+type FrameID = internal.PageFrameID
+
+// FrameID Unique frame identifier.
+//type FrameID string
 
 // Frame Information about the Frame on the page.
 type Frame struct {
