@@ -1103,7 +1103,7 @@ type PageScreencastFrameClient interface {
 
 // PageScreencastFrameReply compressed image data requested by the startScreencast.
 type PageScreencastFrameReply struct {
-	Data      []byte                              `json:"data"`      // Base64-encoded compressed image.
+	Data      string                              `json:"data"`      // Base64-encoded compressed image.
 	Metadata  cdptype.PageScreencastFrameMetadata `json:"metadata"`  // Screencast frame metadata.
 	SessionID int                                 `json:"sessionId"` // Frame number.
 }

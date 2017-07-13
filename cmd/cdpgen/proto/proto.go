@@ -315,9 +315,9 @@ func (at AnyType) GoType(pkg string, d Domain) string {
 
 	// By using a []byte here, Base64-encoded images are automatically
 	// decoded by json.Unmarshal.
-	if at.Type == "string" && strings.HasPrefix(at.Description, "Base64-encoded") {
-		return "[]byte"
-	}
+	// if at.Type == "string" && strings.HasPrefix(at.Description, "Base64-encoded") {
+	// 	return "[]byte"
+	// }
 
 	switch at.Type {
 	case "any":

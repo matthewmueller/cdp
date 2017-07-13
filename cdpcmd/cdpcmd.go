@@ -3918,7 +3918,7 @@ func (a *PageCaptureScreenshotArgs) SetFromSurface(fromSurface bool) *PageCaptur
 
 // PageCaptureScreenshotReply represents the return values for CaptureScreenshot in the Page domain.
 type PageCaptureScreenshotReply struct {
-	Data []byte `json:"data"` // Base64-encoded image data.
+	Data string `json:"data"` // Base64-encoded image data.
 }
 
 // PagePrintToPDFArgs represents the arguments for PrintToPDF in the Page domain.
@@ -4011,7 +4011,7 @@ func (a *PagePrintToPDFArgs) SetPageRanges(pageRanges string) *PagePrintToPDFArg
 
 // PagePrintToPDFReply represents the return values for PrintToPDF in the Page domain.
 type PagePrintToPDFReply struct {
-	Data []byte `json:"data"` // Base64-encoded pdf data.
+	Data string `json:"data"` // Base64-encoded pdf data.
 }
 
 // PageStartScreencastArgs represents the arguments for StartScreencast in the Page domain.

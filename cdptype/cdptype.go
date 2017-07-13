@@ -1805,7 +1805,7 @@ type LayerTreeScrollRect struct {
 type LayerTreePictureTile struct {
 	X       float64 `json:"x"`       // Offset from owning layer left boundary
 	Y       float64 `json:"y"`       // Offset from owning layer top boundary
-	Picture []byte  `json:"picture"` // Base64-encoded snapshot data.
+	Picture string  `json:"picture"` // Base64-encoded snapshot data.
 }
 
 // LayerTreeLayer Information about a compositing layer.
